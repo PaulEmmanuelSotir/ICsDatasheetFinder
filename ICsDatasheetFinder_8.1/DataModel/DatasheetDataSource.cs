@@ -19,7 +19,7 @@ namespace ICsDatasheetFinder_8._1.Data
 {
     public sealed class DatasheetDataSource
     {
-        // Static datasource instance
+        // Static datasource instance 
         private static DatasheetDataSource _datasheetDataSource = new DatasheetDataSource();
 
         private SQLiteConnection connection;
