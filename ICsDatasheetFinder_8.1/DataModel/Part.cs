@@ -23,5 +23,7 @@ namespace ICsDatasheetFinder_8._1.Data
 
         [MaxLength(500)]
         public string datasheetURL { get; set; }
+
+        public bool IsLoadingDatasheet { get; set; }
     }
 }

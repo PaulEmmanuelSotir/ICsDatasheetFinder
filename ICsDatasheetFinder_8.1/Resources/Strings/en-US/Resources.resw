@@ -135,10 +135,19 @@
   <data name="ManufacturersHubHeader.Header" xml:space="preserve">
     <value>Manufacturers</value>
   </data>
+  <data name="MoreResultButton.Content" xml:space="preserve">
+    <value>Find more datasheets</value>
+  </data>
+  <data name="NoDatasheetMessage.Text" xml:space="preserve">
+    <value>No datasheet found.</value>
+  </data>
   <data name="ResultHubHeader.Text" xml:space="preserve">
-    <value>Found datasheets for "</value>
+    <value>datasheet(s) found for "</value>
   </data>
   <data name="SelectAll.Content" xml:space="preserve">
     <value>Select All</value>
+  </data>
+  <data name="VerticalResultHubHeader.Value" xml:space="preserve">
+    <value>datasheet(s) found</value>
   </data>
 </root>

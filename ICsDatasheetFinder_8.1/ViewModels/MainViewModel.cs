@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.UI.Xaml;
 
 namespace ICsDatasheetFinder_8._1.ViewModels
 {
@@ -23,10 +24,12 @@ namespace ICsDatasheetFinder_8._1.ViewModels
         {
             Manufacturers = new BindableCollection<IGrouping<char, Manufacturer>>();
             selectedManufacturers = new List<Manufacturer>();
-            datasheets = new BindableCollection<Part>();
-            //     FoundDatasheets = new Common.IncrementalyLoadingPartList();
-            //selectedManufacturers = new List<Manufacturer>();
-
+            datasheets = new HashSet<Part>();
+            this.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler((obj, Args) =>
+            {
+                if(Args.PropertyName == "ManufacturerSelectionEnabled")
+                    QueryForDatasheets(this);
+            });
         }
 
         protected override async void OnInitialize()
@@ -41,6 +44,14 @@ namespace ICsDatasheetFinder_8._1.ViewModels
             await DatasheetDataSource.LoadManufacturersImagesAsync();
         }
 
+        private async void SeeDatasheet(ItemClickEventArgs e)
+        {
+            var part = e.ClickedItem as Part;
+            part.IsLoadingDatasheet = true;
+            await Launcher.LaunchUriAsync(new Uri(part.datasheetURL));
+            part.IsLoadingDatasheet = false;
+        }
+
         private async void SeeElecDatabase()
         {
             await Launcher.LaunchUriAsync(new Uri("ms-windows-store:PDP?PFN=45311Paul-EmmanuelSotir.ElectronicDatabase_7q75p07zxm5km"));
@@ -51,90 +62,102 @@ namespace ICsDatasheetFinder_8._1.ViewModels
             foreach (Manufacturer manu in e.AddedItems)
             {
                 if (!selectedManufacturers.Contains(manu))
+                {
                     selectedManufacturers.Add(manu);
+                    QueryForDatasheets(this);
+                }
             }
             foreach (Manufacturer manu in e.RemovedItems)
             {
-                selectedManufacturers.Remove(manu);
+                if (selectedManufacturers.Contains(manu))
+                {
+                    selectedManufacturers.Remove(manu);
+                    QueryForDatasheets(this);
+                }
             }
         }
-        //private Task SearchTask;
-        private object obj = new object();
+
         private async void QueryForDatasheets(object sender)
         {
-            Query = (sender as Callisto.Controls.WatermarkTextBox).Text;
+            IsEmptyResult = false;
+            IsMoreResult = false;
 
-            if (ManufacturerSelectionEnabled)
+            if (sender != this)
+                Query = (sender as Callisto.Controls.WatermarkTextBox).Text;
+
+            ulong CurrentQueryNumber = QueryNumber + 1;
+            QueryNumber++;
+            if (CurrentQueryNumber == ulong.MaxValue)
+                CurrentQueryNumber = 0;
+
+            if (Query != string.Empty)
             {
-                // datasheets.reset(Query, selectedManufacturers);
-                // Datasheets = await DatasheetDataSource.SearchForDatasheet(Query, selectedManufacturers);
+                IsProcesssing = true;
+                if (datasheets.Count != 0)
+                {
+                    datasheets.Clear();
+                    NotifyOfPropertyChange<int>(() => DatasheetsCount);
+                }
+                await Task.Factory.StartNew(() =>
+                {
+                    if (ManufacturerSelectionEnabled)
+                        return DatasheetDataSource.SearchForDatasheet(Query, selectedManufacturers, FIRST_SEARCH_RANGE);
+                    return DatasheetDataSource.SearchForDatasheet(Query, FIRST_SEARCH_RANGE);
+                }).ContinueWith(async (ResultingTask) =>
+                {
+                    if (CurrentQueryNumber == QueryNumber)
+                    {
+                        Datasheets.UnionWith(ResultingTask.Result);
+                        NotifyOfPropertyChange<int>(() => DatasheetsCount);
+                        ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList());
+                        IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
+                        await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+                IsProcesssing = false;
+            }
+
+            if (Datasheets.Count == 0 && CurrentQueryNumber == QueryNumber)
+                IsEmptyResult = true;
+            else
+                IsEmptyResult = false;
+        }
+
+        private async void FindMoreResults()
+        {
+            IsProcesssing = true;
+
+            await Task.Factory.StartNew(() =>
+            {
+                if (ManufacturerSelectionEnabled)
+                    return DatasheetDataSource.SearchForDatasheet(Query, selectedManufacturers);
+                return DatasheetDataSource.SearchForDatasheet(Query);
+            }).ContinueWith(async (ResultingTask) =>
+            {
+                datasheets.Clear();
+                Datasheets.UnionWith(ResultingTask.Result);
+                NotifyOfPropertyChange<int>(() => DatasheetsCount);
+                ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList());
+                IsMoreResult = false;
+                await ViewDatasheets.LoadMoreItemsAsync(120);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            IsProcesssing = false;
+        }
+
+        private void Hub_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var ViewHub = (sender as Hub);
+            if (e.NewSize.Width < e.NewSize.Height)
+            {
+                ViewHub.Orientation = Orientation.Vertical;
+               // HeroImageSection.Width = e.NewSize.Width;
             }
             else
             {
-                var SynchronizationCtxt = TaskScheduler.FromCurrentSynchronizationContext();
-
-
-                await Task.Factory.StartNew(() =>
-                {
-                    if (datasheets.Count != 0)
-                        datasheets.Clear();
-                    lock (obj)
-                    {
-                        return DatasheetDataSource.SearchForDatasheet(Query, 120);
-                    }
-                }).ContinueWith((ResultingTask) =>
-                             {
-                                 Datasheets.AddRange(ResultingTask.Result);
-                             }, SynchronizationCtxt);
-
-                /*
-           //     var dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
-                Task.Factory.StartNew(async () =>
-                {
-                    ulong offset = 0;
-
-               /*     datasheets = await DatasheetDataSource.SearchForDatasheet(Query, 10000);
-                    Datasheets2 = datasheets.ToList();
-*/
-                /*
-                                  cts.Token.ThrowIfCancellationRequested();
-
-                                  while (DatasheetDataSource.PART_NUMBER > offset)
-                                  {
-                                      if (DatasheetDataSource.PART_NUMBER <= offset + 10000)
-                                          offset = offset;
-                                      datasheets.UnionWith(await DatasheetDataSource.SearchForDatasheet(Query, 10000, offset));
-                                      Datasheets2 = datasheets.ToList();
-              /*
-                                      // Notify on UI thread
-                                      await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                                          {
-                                              NotifyOfPropertyChange<List<Part>>(() => Datasheets2);
-                                          });
-                                      */
-                /* Task.Factory.StartNew(() =>
-                 {
-                     NotifyOfPropertyChange<IEnumerable<Part>>(() => Datasheets);
-                     NotifyOfPropertyChange<List<Part>>(() => Datasheets2);
-                 }, scheduler);*/
-                /*
-                        offset += 10000;
-                        cts.Token.ThrowIfCancellationRequested();
-                    }
-                    // uint 
-                    // while()
-
-                }, cts.Token);*/
-
-
-                /* DatasheetDataSource.SearchForDatasheet(Query, -1).ContinueWith( (ResultingTask) =>
-                     {
-                         Datasheets = ResultingTask.Result;
-                     }, TaskScheduler.FromCurrentSynchronizationContext());*/
-                // datasheets.reset(Query);
-                // Datasheets = await DatasheetDataSource.SearchForDatasheet(Query);
+                ViewHub.Orientation = Orientation.Horizontal;
+               // HeroImageSection.Width = (Window.Current.Bounds.Width * 2) / 3;
             }
-            //    FoundDatasheets.Query = "NE";
         }
 
         public BindableCollection<IGrouping<char, Manufacturer>> Manufacturers
@@ -166,8 +189,74 @@ namespace ICsDatasheetFinder_8._1.ViewModels
                 return false;
             }
         }
+        private ulong QueryNumber = 0;
 
-        public BindableCollection<Part> Datasheets
+        public bool IsMoreResult
+        {
+            get
+            {
+                return isMoreResult;
+            }
+            set
+            {
+                isMoreResult = value;
+                NotifyOfPropertyChange<bool>(() => IsMoreResult);
+                NotifyOfPropertyChange<bool>(() => IsNoMoreResult);
+            }
+        }
+        private bool isMoreResult = false;
+        public bool IsEmptyResult
+        {
+            get
+            {
+                return isEmptyResult;
+            }
+            set
+            {
+                isEmptyResult = value;
+                NotifyOfPropertyChange<bool>(() => IsEmptyResult);
+            }
+        }
+        private bool isEmptyResult = false;
+        public bool IsNoMoreResult
+        {
+            get
+            {
+                return !IsMoreResult;
+            }
+        }
+        public bool IsProcesssing
+        {
+            get
+            {
+                return isProcessing;
+            }
+            set
+            {
+                isProcessing = value;
+                NotifyOfPropertyChange<bool>(() => IsProcesssing);
+                NotifyOfPropertyChange<bool>(() => IsNotProcesssing);
+            }
+        }
+        private bool isProcessing = false;
+        public bool IsNotProcesssing
+        {
+            get
+            {
+                return !isProcessing;
+            }
+        }
+
+        private const int FIRST_SEARCH_RANGE = 120;
+
+        public int DatasheetsCount
+        {
+            get
+            {
+                return datasheets.Count;
+            }
+        }
+        public HashSet<Part> Datasheets
         {
             get
             {
@@ -176,11 +265,24 @@ namespace ICsDatasheetFinder_8._1.ViewModels
             private set
             {
                 datasheets = value;
-                NotifyOfPropertyChange<BindableCollection<Part>>(() => Datasheets);
+                NotifyOfPropertyChange<HashSet<Part>>(() => Datasheets);
+                NotifyOfPropertyChange<int>(() => DatasheetsCount);
             }
         }
-        private BindableCollection<Part> datasheets;
-
+        private HashSet<Part> datasheets;
+        public Common.IncrementalLoadingDatasheetList ViewDatasheets
+        {
+            get
+            {
+                return viewDatasheets;
+            }
+            private set
+            {
+                viewDatasheets = value;
+                NotifyOfPropertyChange<Common.IncrementalLoadingDatasheetList>(() => ViewDatasheets);
+            }
+        }
+        private Common.IncrementalLoadingDatasheetList viewDatasheets;
         public bool ManufacturerSelectionEnabled
         {
             get

@@ -17,10 +17,13 @@
             <SolidColorBrush x:Key="MainAppBrush" Color="#FFD45500"/>
             <SolidColorBrush x:Key="ForegroundPointerPressedBrush" Color="#9978A9FF"/>
             <SolidColorBrush x:Key="BackgroundPointerOverBrush" Color="#FF77A7FF"/>
+            <SolidColorBrush x:Key="BackgroundPointerOverBrush2" Color="#FFe05a10"/>
             <SolidColorBrush x:Key="ForegroundPointerOverBrush" Color="#996E9FF7"/>
             <SolidColorBrush x:Key="ForegroundPointerOverBrush2" Color="#386E9FF7"/>
             <SolidColorBrush x:Key="ForegroundPointerOverBrush3" Color="#38D45500"/>
+            <SolidColorBrush x:Key="ForegroundPointerOverBrush4" Color="#99D45500"/>
             <SolidColorBrush x:Key="SecondAppBrush" Color="#FF8FB8FF"/>
+            <SolidColorBrush x:Key="ThirdAppBrush" Color="#FFf06e25"/>
             <SolidColorBrush x:Key="AppGray" Color="#FF2D2D2D"/>
 
             <!--PAGE LAYOUT ROOT STYLE-->
@@ -93,8 +96,14 @@
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="Foreground" Value="{StaticResource ApplicationSecondaryForegroundThemeBrush}"/>
             </Style>
-
-
+            <!--TOGGLE SWITCH-->
+            <SolidColorBrush x:Key="ToggleSwitchCurtainBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+            <SolidColorBrush x:Key="ToggleSwitchCurtainPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush2}}"/>
+            <SolidColorBrush x:Key="ToggleSwitchCurtainPressedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource ThirdAppBrush}}"/>
+            <!--PROGRESS BAR-->
+            <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+            <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+            
             <!-- ######## A REUTILISER A L'OCCASION DANS LES NOUVEAUX STYLES ######## -->
             <!--TITLE BUTTON-->
             <!--ButtonBorderThemeBrush
@@ -125,23 +134,12 @@
             <SolidColorBrush x:Key="SliderTrackDecreasePointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush}}"/>
             <SolidColorBrush x:Key="SliderTrackDecreasePressedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource SecondAppBrush}}"/>
             -->
-            <!--TOGGLE SWITCH-->
-            <!--
-            <SolidColorBrush x:Key="ToggleSwitchCurtainBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ToggleSwitchCurtainPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush}}"/>
-            <SolidColorBrush x:Key="ToggleSwitchCurtainPressedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource SecondAppBrush}}"/>
-            -->
             <!--COMBO BOX-->
             <!--
             <SolidColorBrush x:Key="ComboBoxItemSelectedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
             <SolidColorBrush x:Key="ComboBoxSelectedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
             <SolidColorBrush x:Key="ComboBoxSelectedPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush}}"/>
             <SolidColorBrush x:Key="ComboBoxItemSelectedPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush}}"/>
-            -->
-            <!--PROGRESS BAR-->
-            <!--
-            <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
             -->
             <!--HYPER LINK-->
             <!--

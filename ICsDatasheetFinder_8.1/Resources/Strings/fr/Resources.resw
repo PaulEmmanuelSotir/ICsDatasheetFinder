@@ -135,10 +135,19 @@
   <data name="ManufacturersHubHeader.Header" xml:space="preserve">
     <value>Constructeurs</value>
   </data>
+  <data name="MoreResultButton.Content" xml:space="preserve">
+    <value>Chercher plus de datasheets</value>
+  </data>
+  <data name="NoDatasheetMessage.Text" xml:space="preserve">
+    <value>Aucune datasheet trouvée.</value>
+  </data>
   <data name="ResultHubHeader.Text" xml:space="preserve">
-    <value>Fiches techniques trouvées pour "</value>
+    <value>fiche(s) technique(s) trouvée(s) pour "</value>
   </data>
   <data name="SelectAll.Content" xml:space="preserve">
     <value>Tout sélectionner</value>
+  </data>
+  <data name="VerticalResultHubHeader.Value" xml:space="preserve">
+    <value>datasheet(s) trouvée(s)</value>
   </data>
 </root>

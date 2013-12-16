@@ -13,7 +13,6 @@ using SQLite;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Core;
 using Windows.Foundation;
-using System.Collections.ObjectModel;
 
 namespace ICsDatasheetFinder_8._1.Data
 {
@@ -71,9 +70,9 @@ namespace ICsDatasheetFinder_8._1.Data
                     _datasheetDataSource.connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.ReadOnly);
 
                 _datasheetDataSource._allManufacturers = (from manu in _datasheetDataSource.connection.Table<Manufacturer>().ToList()
-                                                         orderby manu.name
-                                                         group manu by manu.name.ToUpper()[0] into g
-                                                         select g).ToList();
+                                                          orderby manu.name
+                                                          group manu by manu.name.ToUpper()[0] into g
+                                                          select g).ToList();
                 SQLiteConnectionPool.Shared.Reset();
                 _datasheetDataSource.connection = null;
             }
@@ -90,44 +89,36 @@ namespace ICsDatasheetFinder_8._1.Data
                  return null;
              }*/
 
-        public static IList<Part> SearchForDatasheet(string queryRef, int MaxRsltCount = -1, ulong startingPos = 0)
+        public static IList<Part> SearchForDatasheet(string queryRef, int MaxRsltCount = -1)
         {
-            return SearchForDatasheet(queryRef, null, MaxRsltCount, startingPos);
+            return SearchForDatasheet(queryRef, null, MaxRsltCount);
         }
 
-        public static IList<Part> SearchForDatasheet(string queryRef, IList<Manufacturer> manufacturers, int MaxRsltCount = -1, ulong startingPos = 0)
+        public static IList<Part> SearchForDatasheet(string queryRef, IList<Manufacturer> manufacturers, int MaxRsltCount = -1)
         {
             if (queryRef != string.Empty && queryRef != null)
             {
-                if (_datasheetDataSource.connection == null)
+                _datasheetDataSource.connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly);
+                string query = MaxRsltCount >= 0 ? "select * from Part where reference LIKE '%{0}%' {1} LIMIT {2}" : "select * from Part where reference LIKE '%{0}%' {1}";
+
+                if (manufacturers != null)
                 {
-                    _datasheetDataSource.connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly);
-                    string query = MaxRsltCount >= 0 ? "select * from Part where reference LIKE '%{0}%' {1} LIMIT {3} OFFSET {2}" : "select * from Part where reference LIKE '%{0}%' {1} LIMIT 10000000 OFFSET {2}";
-
-                    if (manufacturers != null)
-                    {
-                        if (manufacturers.Count == 0)
-                            return new List<Part>();
-                        var man1 = manufacturers[0];
-                        manufacturers.RemoveAt(0);
-                        String Ids = manufacturers.Aggregate<Manufacturer, String>("AND ManufacturerId IN ( '" + man1.Id + "'", (total, next) => total + ", '" + next.Id + "'") + " )";
-                        query = string.Format(query, queryRef, Ids, startingPos, MaxRsltCount);
-                    }
-                    else
-                        query = string.Format(query, queryRef, "", startingPos, MaxRsltCount);
-
-                    var rslt = _datasheetDataSource.connection.Query<Part>(string.Format(query, queryRef, MaxRsltCount, startingPos));
-                    SQLiteConnectionPool.Shared.Reset();
-                    _datasheetDataSource.connection = null;
-
-                    return rslt;
+                    if (manufacturers.Count == 0)
+                        return new List<Part>();
+                    String Ids = "AND ManufacturerId IN ( '" + String.Join("', '", manufacturers.Select((Manu) => Manu.Id)) + "' )";
+                    query = string.Format(query, queryRef, Ids, MaxRsltCount);
                 }
-                return new List<Part>();
+                else
+                    query = string.Format(query, queryRef, "", MaxRsltCount);
+
+                var rslt = _datasheetDataSource.connection.Query<Part>(string.Format(query, queryRef, MaxRsltCount));
+                SQLiteConnectionPool.Shared.Reset();
+                _datasheetDataSource.connection = null;
+
+                return rslt;
             }
             return null;
         }
 
-        // TODO : mettre à jour le nombre de composants !!
-        public static readonly ulong PART_NUMBER = 581647;
     }
 }

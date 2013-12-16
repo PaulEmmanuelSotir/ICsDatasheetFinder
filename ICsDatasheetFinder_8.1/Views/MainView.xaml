@@ -7,82 +7,112 @@
     xmlns:calistoControls="using:Callisto.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:Converters="using:Callisto.Converters"
+    xmlns:CalConverters="using:Callisto.Converters"
     x:Class="ICsDatasheetFinder_8._1.Views.MainView"
     mc:Ignorable="d">
     <Page.Resources>
-        <Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <CollectionViewSource x:Name="DatasheetSource" Source="{Binding Datasheets}"/>
+        <CalConverters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <CollectionViewSource x:Name="DatasheetSource" Source="{Binding ViewDatasheets}"/>
         <CollectionViewSource x:Name="ManufacturerSource" Source="{Binding Manufacturers}" IsSourceGrouped="True"/>
     </Page.Resources>
 
     <Grid Style="{StaticResource LayoutRootStyle}">
-        <Hub>
+        <Hub x:Name="HubView"  cal:Message.Attach="[Event SizeChanged] = [Hub_SizeChanged($source, $eventArgs)]" ScrollViewer.IsHorizontalScrollChainingEnabled="True">
             <Hub.Header>
-                <Grid>
+                <!--<Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"/>
                         <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button  x:Name="GoBack" Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    </Grid.ColumnDefinitions>-->
+                <!--<Button  x:Name="GoBack" Style="{StaticResource NavigationBackButtonNormalStyle}"
 						Margin="-1,-1,39,0" 
 						VerticalAlignment="Top"
 						Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
 						AutomationProperties.Name="Back"
 						AutomationProperties.AutomationId="BackButton"
-						AutomationProperties.ItemType="Navigation Button" Foreground="#FFD45500"/>
-                    <TextBlock Text="{StaticResource AppName}" Style="{StaticResource DatasheetFinderPageHeader}" Grid.Column="1"/>
-                </Grid>
+						AutomationProperties.ItemType="Navigation Button" Foreground="#FFD45500"/>-->
+                <TextBlock Text="{StaticResource AppName}" Style="{StaticResource DatasheetFinderPageHeader}" Grid.Column="1"/>
+                <!--</Grid>-->
             </Hub.Header>
 
-            <HubSection Width="780" Margin="0,0,80,0" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <HubSection x:Name="LogoSection" Width="550" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                 <DataTemplate>
                     <Image Source="ms-appx:///Resources/Images/Logo.png" MaxWidth="521" MaxHeight="454"/>
                 </DataTemplate>
             </HubSection>
 
-            <HubSection Margin="0,0,80,0">
+            <HubSection x:Name="InputHubSection">
                 <DataTemplate>
                     <StackPanel MaxWidth="600" VerticalAlignment="Top" Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
                         <TextBlock x:Uid="EnterAref_TextBlock" Style="{StaticResource SubheaderTextStyle}" Margin="20,20,20,0"/>
-                        <calistoControls:WatermarkTextBox x:Uid="EnterAref_TextBox" cal:Message.Attach="[Event TextChanged] = [QueryForDatasheets($source)]" Margin="20,40,20,80" HorizontalAlignment="Left" MinWidth="71" Width="256" MaxLength="30" TextChanged="WatermarkTextBox_TextChanged"/>
+                        <calistoControls:WatermarkTextBox x:Uid="EnterAref_TextBox" cal:Message.Attach="[Event TextChanged] = [QueryForDatasheets($source)]" Margin="20,40,20,80" HorizontalAlignment="Left" MinWidth="71" Width="256" MaxLength="30" TextChanged="WatermarkTextBox_TextChanged" Loaded="WatermarkTextBox_Loaded"/>
                     </StackPanel>
                 </DataTemplate>
             </HubSection>
 
-            <HubSection MaxWidth="1200" Visibility="{Binding IsAnyQuery, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalContentAlignment="Stretch">
+            <HubSection x:Name="DatasheetsHubSection" MaxWidth="1200" Visibility="{Binding IsAnyQuery, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalContentAlignment="Stretch">
                 <HubSection.Header>
-                    <TextBlock Style="{StaticResource SubheaderTextStyle}"> 
-						<Run x:Uid="ResultHubHeader" Text="Found datasheets for "/>
-						<Run Text="{Binding Query}"/>
-						<Run Text='"'/>
-                    </TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Style="{StaticResource SubheaderTextStyle}" Visibility="{Binding IsNoMoreResult, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,0,10,0">
+                            <Run Text="{Binding DatasheetsCount}" FontWeight="Bold"/>
+                        </TextBlock>
+                        <TextBlock x:Name="ResultHubHeader" Grid.Column="1" Style="{StaticResource SubheaderTextStyle}">
+						    <Run x:Uid="ResultHubHeader" Text="datasheets found for "/>
+						    <Run Text="{Binding Query}"/>
+						    <Run Text='"'/>
+                        </TextBlock>
+                    </Grid>
                 </HubSection.Header>
                 <DataTemplate>
-                    <GridView SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{Binding Source={StaticResource DatasheetSource}}" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Padding="40,20,0,20" Margin="0,0,0,80">
-                        <GridView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Width="200" Height="100">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Text="{Binding reference}" FontFamily="Segoe UI Light" FontSize="18" TextWrapping="Wrap" Foreground="White"/>
-                                    <HyperlinkButton NavigateUri="{Binding datasheetURL}" Content="{Binding datasheetURL}" FontSize="10" Grid.Row="1" FontWeight="Bold" Foreground="White" />
-                                </Grid>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                        <GridView.ItemContainerStyle>
-                            <Style TargetType="GridViewItem">
-                                <Setter Property="Margin" Value="10"/>
-                                <Setter Property="Background" Value="{StaticResource MainAppBrush}"/>
-                            </Style>
-                        </GridView.ItemContainerStyle>
-                    </GridView>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Button x:Uid="MoreResultButton" IsEnabled="{Binding IsNotProcesssing}" Content="Find more results" HorizontalAlignment="Left" Visibility="{Binding IsMoreResult, Converter={StaticResource BooleanToVisibilityConverter}}" cal:Message.Attach="[Event Click] = [FindMoreResults()]" Margin="0,0,0,10" FontSize="16"/>
+
+                        <ProgressBar Grid.Row="1" IsIndeterminate="True" Visibility="{Binding IsProcesssing, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                        <GridView Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{Binding Source={StaticResource DatasheetSource}}"  ScrollViewer.IsHorizontalScrollChainingEnabled="True"
+                                  Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Padding="40,20,0,20" Margin="0,0,0,40"
+                                  cal:Message.Attach="[Event ItemClick] = [SeeDatasheet($eventArgs)]">
+                            <GridView.Header>
+                                <TextBlock x:Uid="NoDatasheetMessage" Visibility="{Binding IsEmptyResult, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource SubheaderTextStyle}" Text="Aucune datasheet trouvée." Margin="0,0,40,0"/>
+                            </GridView.Header>
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Width="240" Height="80" Background="{StaticResource MainAppBrush}">
+                                        <ProgressBar IsIndeterminate="True" Visibility="{Binding IsLoadingDatasheet, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
+                                            <ProgressBar.RenderTransform>
+                                                <CompositeTransform TranslateX="0" TranslateY="5"/>
+                                            </ProgressBar.RenderTransform>
+                                        </ProgressBar>
+                                        <TextBlock Text="{Binding reference}" FontFamily="Segoe UI Light" FontSize="20" TextWrapping="Wrap" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Margin="10,5,5,5" RenderTransformOrigin="0.5,0.5">
+                                            <TextBlock.RenderTransform>
+                                                <CompositeTransform TranslateX="0" TranslateY="-3"/>
+                                            </TextBlock.RenderTransform>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                            <GridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="Margin" Value="10"/>
+                                </Style>
+                            </GridView.ItemContainerStyle>
+                        </GridView>
+
+
+                    </Grid>
                 </DataTemplate>
             </HubSection>
 
-            <HubSection Width="1200" x:Uid="ManufacturersHubHeader" Header="Manufacturers" VerticalContentAlignment="Stretch">
+            <HubSection x:Name="ManufacturersHubSection" x:Uid="ManufacturersHubHeader" Header="Manufacturers" VerticalContentAlignment="Stretch">
                 <HubSection.HeaderTemplate>
                     <DataTemplate>
                         <TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding}"/>
@@ -96,7 +126,7 @@
                         </Grid.RowDefinitions>
                         <ToggleSwitch x:Name="EnableManufacturerSelection" x:Uid="ManufacturerSelectionToggleSwitch" IsOn="{Binding ManufacturerSelectionEnabled, Mode=TwoWay}"/>
                         <!--Manufacturers semantic zoom-->
-                        <SemanticZoom Grid.Row="1" Margin="0,0,40,80" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Loaded="ManufacturersSemanticZoom_Loaded" IsEnabled="{Binding IsOn, ElementName=EnableManufacturerSelection}" >
+                        <SemanticZoom Grid.Row="1" Margin="0,0,0,40" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Loaded="ManufacturersSemanticZoom_Loaded" IsEnabled="{Binding IsOn, ElementName=EnableManufacturerSelection}" >
                             <SemanticZoom.ZoomedOutView>
                                 <GridView HorizontalAlignment="Center" ScrollViewer.IsHorizontalScrollChainingEnabled="False">
                                     <GridView.ItemTemplate>
@@ -169,19 +199,67 @@
                 </DataTemplate>
             </HubSection>
 
-            <HubSection Margin="0,0,80,0" x:Uid="ElectronicDatabaseFeaturingHeader" Header="Another usefull app on the Store">
+            <HubSection x:Name="ElectronicDatabaseFeaturingHubSection" x:Uid="ElectronicDatabaseFeaturingHeader" Header="Another usefull app on the Store">
                 <HubSection.HeaderTemplate>
                     <DataTemplate>
                         <TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding}"/>
                     </DataTemplate>
                 </HubSection.HeaderTemplate>
                 <DataTemplate>
-                    <Image Source="ms-appx:///Resources/Images/ElecDB_Featuring.png" Stretch="None" 
-						VerticalAlignment="Top" HorizontalAlignment="Left"
-						calistoEffect:Tilt.IsTiltEnabled="True" CacheMode="BitmapCache"
-						cal:Message.Attach="[Event Tapped] = [SeeElecDatabase()]"/>
+                    <Image Source="ms-appx:///Resources/Images/ElecDB_Featuring.png" CacheMode="BitmapCache" 
+                           calistoEffect:Tilt.IsTiltEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top"
+						   cal:Message.Attach="[Event Tapped] = [SeeElecDatabase()]" Stretch="None"/>
                 </DataTemplate>
             </HubSection>
         </Hub>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="Views">
+                <VisualState x:Name="Horizontal">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="Width">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1200"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Vertical">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LogoSection" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DatasheetsHubSection" Storyboard.TargetProperty="MaxHeight">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1000"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="MaxHeight">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="1000"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="HorizontalAlignment">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Stretch"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="VerticalContentAlignment">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Top"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ElectronicDatabaseFeaturingHubSection" Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DatasheetsHubSection" Storyboard.TargetProperty="Padding">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="40,40,40,44"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InputHubSection" Storyboard.TargetProperty="Padding">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="40,40,40,44"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="Padding">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="40,40,40,44"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ResultHubHeader" Storyboard.TargetProperty="Text">
+                            <DiscreteObjectKeyFrame KeyTime="0" x:Uid="VerticalResultHubHeader"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>
