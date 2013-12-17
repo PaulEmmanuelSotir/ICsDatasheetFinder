@@ -14,7 +14,10 @@
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>ICsDatasheetFinder_8.1_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>ICsDatasheetFinder_8.1_StoreKey.pfx</PackageCertificateKeyFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>E5F2A06F1F0A922517B060F62B279E332B8ADCC6</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -128,6 +131,7 @@
     <Content Include="Data\datasheets.sqlite.compressed">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ICsDatasheetFinder_8.1_StoreKey.pfx" />
     <None Include="ICsDatasheetFinder_8.1_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <PRIResource Include="Resources\Strings\en-US\Resources.resw" />
@@ -906,6 +910,7 @@
     <Content Include="Data\ManufacturersImages\Zilog.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Package.StoreAssociation.xml" />
     <Content Include="Resources\Images\ElecDB_Featuring.scale-100.png" />
     <Content Include="Resources\Images\Logo.scale-100.png" />
     <Content Include="Resources\Images\Logo.scale-80.png" />

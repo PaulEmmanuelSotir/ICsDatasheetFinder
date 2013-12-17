@@ -126,6 +126,9 @@
   <data name="EnterAref_TextBox.Watermark" xml:space="preserve">
     <value>Reference...</value>
   </data>
+  <data name="Legal.Text" xml:space="preserve">
+    <value>Tout les logos de fournisseurs et constructeurs appartiennent à leur propriétaires respectifs. Nous ne sommes pas représentants de ces marques ou companies.</value>
+  </data>
   <data name="ManufacturerSelectionToggleSwitch.OffContent" xml:space="preserve">
     <value>Chercher parmi tous les constructeurs</value>
   </data>

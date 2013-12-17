@@ -54,12 +54,6 @@ namespace ICsDatasheetFinder_8._1.Views
         }
         
         private WindowHelper _windowHelper;
-        
         private bool FirstTime = true;
-
-        private void WatermarkTextBox_Loaded(object sender, RoutedEventArgs e)
-        {
-            (sender as Callisto.Controls.WatermarkTextBox).Focus(FocusState.Programmatic);
-        }
     }
 }

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="aa424Paul-EmmanuelSotir.DatasheetFinderdf444b28" Publisher="CN=paule_000" Version="2.0.0.0" />
+  <Identity Name="45311Paul-EmmanuelSotir.DatasheetFinder" Publisher="CN=009D8092-8793-41A6-A6D9-70B37ECAC40F" Version="1.1.0.0" />
   <Properties>
-    <DisplayName>ICsDatasheetFinder_8.1</DisplayName>
-    <PublisherDisplayName>Paul-Emmanuel SOTIR</PublisherDisplayName>
+    <DisplayName>Datasheet Finder</DisplayName>
+    <PublisherDisplayName>Paul-Emmanuel Sotir</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>
@@ -27,6 +27,9 @@
         </m2:InitialRotationPreference>
         <m2:ApplicationView MinWidth="width500" />
       </m2:VisualElements>
+      <Extensions>
+        <Extension Category="windows.search" />
+      </Extensions>
     </Application>
   </Applications>
 </Package>

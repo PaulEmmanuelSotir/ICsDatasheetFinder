@@ -45,7 +45,7 @@
                 <DataTemplate>
                     <StackPanel MaxWidth="600" VerticalAlignment="Top" Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
                         <TextBlock x:Uid="EnterAref_TextBlock" Style="{StaticResource SubheaderTextStyle}" Margin="20,20,20,0"/>
-                        <calistoControls:WatermarkTextBox x:Uid="EnterAref_TextBox" cal:Message.Attach="[Event TextChanged] = [QueryForDatasheets($source)]" Margin="20,40,20,80" HorizontalAlignment="Left" MinWidth="71" Width="256" MaxLength="30" TextChanged="WatermarkTextBox_TextChanged" Loaded="WatermarkTextBox_Loaded"/>
+                        <calistoControls:WatermarkTextBox x:Uid="EnterAref_TextBox" cal:Message.Attach="[Event TextChanged] = [QueryForDatasheets($source)]; [Event Loaded] = [QueryTextBox_Loaded($source)]" Margin="20,40,20,80" HorizontalAlignment="Left" MinWidth="71" Width="256" MaxLength="30" TextChanged="WatermarkTextBox_TextChanged"/>
                     </StackPanel>
                 </DataTemplate>
             </HubSection>
@@ -97,6 +97,7 @@
                                                 <CompositeTransform TranslateX="0" TranslateY="-3"/>
                                             </TextBlock.RenderTransform>
                                         </TextBlock>
+                                        <TextBlock Text="{Binding ManufacturerName}" FontFamily="Segoe UI Semibold" TextWrapping="NoWrap" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,2,2" FontSize="12" TextTrimming="CharacterEllipsis" FontWeight="Bold"/>
                                     </Grid>
                                 </DataTemplate>
                             </GridView.ItemTemplate>

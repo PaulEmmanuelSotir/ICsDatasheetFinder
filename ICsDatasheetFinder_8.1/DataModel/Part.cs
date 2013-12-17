@@ -21,6 +21,8 @@ namespace ICsDatasheetFinder_8._1.Data
         [Indexed]
         public int ManufacturerId { get; set; }
 
+        public string ManufacturerName { get; set; }
+
         [MaxLength(500)]
         public string datasheetURL { get; set; }
 

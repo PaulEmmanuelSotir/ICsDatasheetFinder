@@ -32,16 +32,38 @@ namespace ICsDatasheetFinder_8._1.ViewModels
             });
         }
 
+        private string parameter;
+        public string Parameter
+        {
+            get
+            {
+                return parameter;
+            }
+            set
+            {
+                parameter = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        // TODO : temp
+           // var searchPane = SearchPane.GetForCurrentView();
+           // searchPane.Show();
+
         protected override async void OnInitialize()
         {
             base.OnInitialize();
 
+            Query = Parameter ?? "";
             await Task.Factory.StartNew(() =>
             {
                 Manufacturers.AddRange(DatasheetDataSource.GetManufacturers());
             });
             // Load manufacturers logos
             await DatasheetDataSource.LoadManufacturersImagesAsync();
+
+            if (Query != string.Empty)
+                QueryForDatasheets(this);
         }
 
         private async void SeeDatasheet(ItemClickEventArgs e)
@@ -109,7 +131,8 @@ namespace ICsDatasheetFinder_8._1.ViewModels
                     {
                         Datasheets.UnionWith(ResultingTask.Result);
                         NotifyOfPropertyChange<int>(() => DatasheetsCount);
-                        ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList());
+                        var rslt = (from t in Manufacturers from manu in t select manu).ToList<Manufacturer>();
+                        ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), rslt);
                         IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
                         await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
                     }
@@ -137,12 +160,27 @@ namespace ICsDatasheetFinder_8._1.ViewModels
                 datasheets.Clear();
                 Datasheets.UnionWith(ResultingTask.Result);
                 NotifyOfPropertyChange<int>(() => DatasheetsCount);
-                ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList());
+                var rslt = (from t in Manufacturers from manu in t select manu).ToList<Manufacturer>();
+                ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), rslt);
                 IsMoreResult = false;
                 await ViewDatasheets.LoadMoreItemsAsync(120);
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
             IsProcesssing = false;
+        }
+
+        private void QueryTextBox_Loaded(object sender)
+        {
+            var txtBox = (sender as Callisto.Controls.WatermarkTextBox);
+            // Ecrit la requete issue du search panel dans le watermarkTextBox
+            if (Query != string.Empty)
+            {
+                txtBox.Text = Query;
+                // Place le curseur à la fin du texte
+                txtBox.Select(txtBox.Text.Length, 0);
+            }
+            txtBox.PreventKeyboardDisplayOnProgrammaticFocus = false;
+            txtBox.Focus(FocusState.Programmatic);
         }
 
         private void Hub_SizeChanged(object sender, SizeChangedEventArgs e)

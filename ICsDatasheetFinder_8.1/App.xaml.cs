@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Search;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Compression;
@@ -16,6 +17,8 @@ using ICsDatasheetFinder_8._1.Views;
 
 // Pour plus d'informations sur le modèle Application vide, consultez la page http://go.microsoft.com/fwlink/?LinkId=234227
 
+// TODO: ajouer les legal info !!
+
 namespace ICsDatasheetFinder_8._1
 {
     /// <summary>
@@ -26,6 +29,7 @@ namespace ICsDatasheetFinder_8._1
         public App()
         {
             this.InitializeComponent();
+            //Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "fr-FR";
         }
 
         protected override void Configure()
@@ -38,7 +42,7 @@ namespace ICsDatasheetFinder_8._1
 
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
-
+            
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -82,7 +86,18 @@ namespace ICsDatasheetFinder_8._1
                     //TODO gèrer les exceptions
                 }
             }
-            DisplayRootView<MainView>();
+
+            DisplayRootView<MainView>(e.Arguments);
+        }
+
+        protected override void OnSearchActivated(SearchActivatedEventArgs args)
+        {
+            DisplayRootView<MainView>(args.QueryText);
+        }
+
+        private void OnQuerySubmitted(object sender, SearchPaneQuerySubmittedEventArgs args)
+        {
+            DisplayRootView<MainView>(args.QueryText);
         }
 
         /// <summary>
