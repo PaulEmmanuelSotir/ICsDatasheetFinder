@@ -124,10 +124,11 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <ToggleSwitch x:Name="EnableManufacturerSelection" x:Uid="ManufacturerSelectionToggleSwitch" IsOn="{Binding ManufacturerSelectionEnabled, Mode=TwoWay}"/>
                         <!--Manufacturers semantic zoom-->
-                        <SemanticZoom Grid.Row="1" Margin="0,0,0,40" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Loaded="ManufacturersSemanticZoom_Loaded" IsEnabled="{Binding IsOn, ElementName=EnableManufacturerSelection}" >
+                        <SemanticZoom Grid.Row="1" Margin="0" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Loaded="ManufacturersSemanticZoom_Loaded" IsEnabled="{Binding IsOn, ElementName=EnableManufacturerSelection}" >
                             <SemanticZoom.ZoomedOutView>
                                 <GridView HorizontalAlignment="Center" ScrollViewer.IsHorizontalScrollChainingEnabled="False">
                                     <GridView.ItemTemplate>
@@ -196,6 +197,7 @@
                                 </GridView>
                             </SemanticZoom.ZoomedInView>
                         </SemanticZoom>
+                        <TextBlock Grid.Row="2" x:Uid="Legal" Style="{StaticResource BaselineTextStyle}" Text="Les logos de manufacturers ...." FontStyle="Italic" Margin="0,0,0,40"/>
                     </Grid>
                 </DataTemplate>
             </HubSection>
