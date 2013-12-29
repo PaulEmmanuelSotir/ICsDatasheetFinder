@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Windows.Storage.Streams;
@@ -18,10 +19,7 @@ namespace ICsDatasheetFinder_8._1.Data
 {
     public sealed class DatasheetDataSource
     {
-        // Static datasource instance 
         private static DatasheetDataSource _datasheetDataSource = new DatasheetDataSource();
-
-        private SQLiteConnection connection;
 
         public static async Task LoadManufacturersImagesAsync()
         {
@@ -66,40 +64,37 @@ namespace ICsDatasheetFinder_8._1.Data
         {
             if (_datasheetDataSource._allManufacturers.Count == 0)
             {
-                if (_datasheetDataSource.connection == null)
-                    _datasheetDataSource.connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.ReadOnly);
-
-                _datasheetDataSource._allManufacturers = (from manu in _datasheetDataSource.connection.Table<Manufacturer>().ToList()
+                SQLiteConnection connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.ReadOnly);
+                _datasheetDataSource._allManufacturers = (from manu in connection.Table<Manufacturer>().ToList()
                                                           orderby manu.name
                                                           group manu by manu.name.ToUpper()[0] into g
                                                           select g).ToList();
-                SQLiteConnectionPool.Shared.Reset();
-                _datasheetDataSource.connection = null;
+                connection.Close();
             }
             return _datasheetDataSource._allManufacturers;
         }
 
         private List<IGrouping<char, Manufacturer>> _allManufacturers = new List<IGrouping<char, Manufacturer>>();
 
-        /*     public static Manufacturer GetManufacturer(string Id)
-             {
-                 // Simple linear search is acceptable for small data sets
-                 var matches = _datasheetDataSource._allManufacturers.Where((man) => man.Id.Equals(Id));
-                 if (matches.Count() == 1) return matches.First();
-                 return null;
-             }*/
-
-        public static IList<Part> SearchForDatasheet(string queryRef, int MaxRsltCount = -1)
+        public static IList<Part> SearchForDatasheet(string queryRef, CancellationToken CancelToken, int MaxRsltCount = -1)
         {
-            return SearchForDatasheet(queryRef, null, MaxRsltCount);
+            return SearchForDatasheet(queryRef, CancelToken, null, MaxRsltCount);
         }
 
-        public static IList<Part> SearchForDatasheet(string queryRef, IList<Manufacturer> manufacturers, int MaxRsltCount = -1)
+        public static IList<Part> SearchForDatasheet(string queryRef, CancellationToken CancelToken, IList<Manufacturer> manufacturers, int MaxRsltCount = -1)
         {
             if (queryRef != string.Empty && queryRef != null)
             {
-                _datasheetDataSource.connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly);
-                string query = MaxRsltCount >= 0 ? "select * from Part where reference LIKE '%{0}%' {1} LIMIT {2}" : "select * from Part where reference LIKE '%{0}%' {1}";
+                string query = string.Empty;
+                SQLiteConnection connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly);
+
+                query = MaxRsltCount >= 0 ? "select * from Part where reference LIKE '%{0}%' {1} LIMIT {2}" : "select * from Part where reference LIKE '%{0}%' {1}";
+
+                if (CancelToken.IsCancellationRequested)
+                {
+                    connection.Close();
+                    CancelToken.ThrowIfCancellationRequested();
+                }
 
                 if (manufacturers != null)
                 {
@@ -111,14 +106,20 @@ namespace ICsDatasheetFinder_8._1.Data
                 else
                     query = string.Format(query, queryRef, "", MaxRsltCount);
 
-                var rslt = _datasheetDataSource.connection.Query<Part>(string.Format(query, queryRef, MaxRsltCount));
-                SQLiteConnectionPool.Shared.Reset();
-                _datasheetDataSource.connection = null;
+                if (CancelToken.IsCancellationRequested)
+                {
+                    connection.Close();
+                    CancelToken.ThrowIfCancellationRequested();
+                }
+
+                var rslt = connection.Query<Part>(string.Format(query, queryRef, MaxRsltCount));
+                connection.Close();
+
+                CancelToken.ThrowIfCancellationRequested();
 
                 return rslt;
             }
             return null;
         }
-
     }
 }

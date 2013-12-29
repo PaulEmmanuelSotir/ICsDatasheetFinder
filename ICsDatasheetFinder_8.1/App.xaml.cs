@@ -38,7 +38,8 @@ namespace ICsDatasheetFinder_8._1
             container.RegisterWinRTServices();
 
             container.PerRequest<MainViewModel>();
-        }
+            container.PerRequest<DatasheetViewModel>();
+        }   
 
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {

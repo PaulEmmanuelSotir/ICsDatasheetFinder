@@ -9,7 +9,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:CalConverters="using:Callisto.Converters"
     x:Class="ICsDatasheetFinder_8._1.Views.MainView"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    cal:Message.Attach="[Event SizeChanged] = [PageSizeChanged($source, $eventArgs)]">
     <Page.Resources>
         <CalConverters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <CollectionViewSource x:Name="DatasheetSource" Source="{Binding ViewDatasheets}"/>
@@ -17,7 +18,7 @@
     </Page.Resources>
 
     <Grid Style="{StaticResource LayoutRootStyle}">
-        <Hub x:Name="HubView"  cal:Message.Attach="[Event SizeChanged] = [Hub_SizeChanged($source, $eventArgs)]" ScrollViewer.IsHorizontalScrollChainingEnabled="True">
+        <Hub x:Name="HubView" ScrollViewer.IsHorizontalScrollChainingEnabled="True" Orientation="{Binding HubOrientation}">
             <Hub.Header>
                 <!--<Grid>
                     <Grid.ColumnDefinitions>
@@ -50,7 +51,7 @@
                 </DataTemplate>
             </HubSection>
 
-            <HubSection x:Name="DatasheetsHubSection" MaxWidth="1200" Visibility="{Binding IsAnyQuery, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalContentAlignment="Stretch">
+            <HubSection x:Name="DatasheetsHubSection" MaxWidth="1200" MaxHeight="2560" Visibility="{Binding IsAnyQuery, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalContentAlignment="Stretch">
                 <HubSection.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -113,6 +114,7 @@
                 </DataTemplate>
             </HubSection>
 
+            <!--TODO : changer le violet de la selection des manufacturers-->
             <HubSection x:Name="ManufacturersHubSection" x:Uid="ManufacturersHubHeader" Header="Manufacturers" VerticalContentAlignment="Stretch">
                 <HubSection.HeaderTemplate>
                     <DataTemplate>
@@ -130,7 +132,7 @@
                         <!--Manufacturers semantic zoom-->
                         <SemanticZoom Grid.Row="1" Margin="0" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Loaded="ManufacturersSemanticZoom_Loaded" IsEnabled="{Binding IsOn, ElementName=EnableManufacturerSelection}" >
                             <SemanticZoom.ZoomedOutView>
-                                <GridView HorizontalAlignment="Center" ScrollViewer.IsHorizontalScrollChainingEnabled="False">
+                                <GridView >
                                     <GridView.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Group.Key}" FontFamily="Segoe UI Light" Foreground="Black" FontSize="36"/>

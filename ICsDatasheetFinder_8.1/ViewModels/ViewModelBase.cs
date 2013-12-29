@@ -19,6 +19,11 @@ namespace ICsDatasheetFinder_8._1.ViewModels
             this.navigationService = navigationService;
         }
 
+        public void GoTo<ViewModelType>(object parameter = null)
+        {
+            navigationService.NavigateToViewModel<ViewModelType>(parameter);
+        }
+
         public void GoBack()
         {
             navigationService.GoBack();

@@ -1,0 +1,104 @@
+﻿<Page
+    x:Class="ICsDatasheetFinder_8._1.Views.DatasheetView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ICsDatasheetFinder_8._1.Views"
+    xmlns:CalConverters="using:Callisto.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <CalConverters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <CollectionViewSource x:Key="DatasheetPagesSource" Source="{Binding DatasheetPages}"/>
+        <Style x:Key="ItemsControlStyle" TargetType="ItemsControl">
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Horizontal" Margin="90,0" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <ScrollViewer ZoomMode="Enabled"
+                              VerticalSnapPointsType="None"
+                              VerticalScrollMode="Disabled"
+                              VerticalScrollBarVisibility="Disabled"
+                              HorizontalScrollMode="Enabled" 
+                              HorizontalScrollBarVisibility="Visible"
+                              VerticalContentAlignment="Center">
+                            <ItemsPresenter VerticalAlignment="Center" IsHitTestVisible="False" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid  Background="{StaticResource AppGray}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+
+            </StackPanel>
+            <Button  x:Name="GoBack" Style="{StaticResource NavigationBackButtonNormalStyle}"
+                        Margin="36,0,36,36"
+                        Height="48" Width="48"
+                        VerticalAlignment="Bottom"
+						Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+						AutomationProperties.Name="Back"
+						AutomationProperties.AutomationId="BackButton"
+						AutomationProperties.ItemType="Navigation Button" Foreground="#FFD45500"/>
+            <TextBlock Style="{StaticResource HeaderTextBlockStyle}" HorizontalAlignment="Left" Margin="0,0,30,40" Grid.Column="1" VerticalAlignment="Bottom" Foreground="White">
+            <Run Text="Datasheet of '"/>
+            <Run Text="{Binding Parameter.reference}"/>
+            <Run Text="'"/>
+            </TextBlock>
+        </Grid>
+
+        <ProgressRing Grid.Row="1" Visibility="{Binding IsLoadingDatasheet, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource DatasheetPagesSource}}" Style="{StaticResource ItemsControlStyle}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding}" Stretch="None">
+                        <Image.Transitions>
+                            <TransitionCollection>
+                                <AddDeleteThemeTransition/>
+                            </TransitionCollection>
+                        </Image.Transitions>
+                    </Image>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!--<ListView ItemsSource="{Binding Source={StaticResource DatasheetPagesSource}}" Grid.Row="1" SelectionMode="None" ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.IsZoomInertiaEnabled="True" ScrollViewer.ZoomMode="Enabled" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding}" Stretch="None"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            -->
+        <!--<ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>-->
+        <!--
+        </ListView>-->
+    </Grid>
+</Page>
