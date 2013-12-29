@@ -17,14 +17,20 @@ namespace ICsDatasheetFinder_8._1.Common
 
         protected async override Task<IList<object>> LoadMoreItemsOverrideAsync(System.Threading.CancellationToken c, uint count)
         {
+
             uint ToDo = System.Math.Min((uint)count, (uint)DatasheetList.Count - doneCount);
-            var rslt = DatasheetList.GetRange((int)doneCount, (int)ToDo).ToList<object>();
-            foreach(Data.Part part in rslt)
+            var rslt = DatasheetList.GetRange((int)doneCount, (int)ToDo);
+
+            await Task.Run(() =>
             {
-                part.ManufacturerName = Manufacturers.Find(manu => manu.Id == part.ManufacturerId).name;
-            }
+                Parallel.ForEach(rslt, (part) =>
+                {
+                    part.ManufacturerName = Manufacturers.Find(manu => manu.Id == part.ManufacturerId).name;
+                });
+            });
+
             doneCount += ToDo;
-            return rslt;
+            return rslt.ToList<object>();
         }
 
         protected override bool HasMoreItemsOverride()

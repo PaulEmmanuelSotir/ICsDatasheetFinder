@@ -81,13 +81,13 @@
 
                         <GridView Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{Binding Source={StaticResource DatasheetSource}}"  ScrollViewer.IsHorizontalScrollChainingEnabled="True"
                                   Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Padding="40,20,0,20" Margin="0,0,0,40"
-                                  cal:Message.Attach="[Event ItemClick] = [SeeDatasheet($eventArgs)]">
+                                  cal:Message.Attach="[Event ItemClick] = [SeeDatasheet($eventArgs)]" ShowsScrollingPlaceholders="False" IncrementalLoadingThreshold="120" IsSynchronizedWithCurrentItem="False" HorizontalContentAlignment="Left" VerticalContentAlignment="Top">
                             <GridView.Header>
                                 <TextBlock x:Uid="NoDatasheetMessage" Visibility="{Binding IsEmptyResult, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource SubheaderTextStyle}" Text="Aucune datasheet trouvée." Margin="0,0,40,0"/>
                             </GridView.Header>
                             <GridView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Width="240" Height="80" Background="{StaticResource MainAppBrush}" CacheMode="BitmapCache" >
+                                    <Grid Width="240" Height="80" Background="{StaticResource MainAppBrush}"  >
                                         <TextBlock Text="{Binding reference}" FontFamily="Segoe UI Light" FontSize="20" TextWrapping="Wrap" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Margin="10,5,5,5" RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <CompositeTransform TranslateX="0" TranslateY="-3"/>
