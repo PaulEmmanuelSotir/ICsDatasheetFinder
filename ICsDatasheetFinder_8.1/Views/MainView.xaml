@@ -87,12 +87,7 @@
                             </GridView.Header>
                             <GridView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Width="240" Height="80" Background="{StaticResource MainAppBrush}">
-                                        <ProgressBar IsIndeterminate="True" Visibility="{Binding IsLoadingDatasheet, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
-                                            <ProgressBar.RenderTransform>
-                                                <CompositeTransform TranslateX="0" TranslateY="5"/>
-                                            </ProgressBar.RenderTransform>
-                                        </ProgressBar>
+                                    <Grid Width="240" Height="80" Background="{StaticResource MainAppBrush}" CacheMode="BitmapCache" >
                                         <TextBlock Text="{Binding reference}" FontFamily="Segoe UI Light" FontSize="20" TextWrapping="Wrap" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Margin="10,5,5,5" RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <CompositeTransform TranslateX="0" TranslateY="-3"/>

@@ -65,7 +65,7 @@ namespace ICsDatasheetFinder_8._1
                     {
                         await DecompressDatabase(false);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //TODO gèrer les exceptions
                         // Utliliser les 'Coroutines' pour les messages à afficher à l'utlisateur un message, voir http://caliburnmicro.codeplex.com/wikipage?title=The%20Event%20Aggregator&referringTitle=Documentation
@@ -82,7 +82,7 @@ namespace ICsDatasheetFinder_8._1
                 {
                     await DecompressDatabase(true);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //TODO gèrer les exceptions
                 }

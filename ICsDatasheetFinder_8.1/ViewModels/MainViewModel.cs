@@ -11,7 +11,6 @@ using Windows.System;
 using Caliburn.Micro;
 using ICsDatasheetFinder_8._1.Data;
 using System.Collections.ObjectModel;
-using System.Threading;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -71,11 +70,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
             if (part.datasheetURL.LastIndexOf(".pdf", StringComparison.OrdinalIgnoreCase) == part.datasheetURL.Length - 4)
                 GoTo<DatasheetViewModel>(part);
             else
-            {
-                part.IsLoadingDatasheet = true;
                 await Launcher.LaunchUriAsync(new Uri(part.datasheetURL));
-                part.IsLoadingDatasheet = false;
-            }
         }
 
         private async void SeeElecDatabase()
@@ -161,7 +156,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
                 else
                     IsEmptyResult = false;
             }
-            catch (OperationCanceledException e) { }
+            catch (OperationCanceledException) { }
         }
 
         private async void FindMoreResults()
@@ -196,7 +191,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
                 CurrentTokenSource.Token.ThrowIfCancellationRequested();
                 IsProcesssing = false;
             }
-            catch (OperationCanceledException e) { }
+            catch (OperationCanceledException) { }
         }
 
         private void QueryTextBox_Loaded(object sender)

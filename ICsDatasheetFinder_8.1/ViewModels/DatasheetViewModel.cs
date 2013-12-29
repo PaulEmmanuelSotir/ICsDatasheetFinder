@@ -61,7 +61,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
                 if (_pdfDocument != null)
                 {
-
                     for (uint i = 0; i < _pdfDocument.PageCount; i++)
                     {
                         //Get Pdf page
@@ -94,7 +93,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
                     }
                 }
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 IsLoadingDatasheet = false;
                 //TODO : gerer l'erreur
@@ -103,9 +102,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
         private async void SeeDatasheetOnBrowser()
         {
-            Parameter.IsLoadingDatasheet = true;
             await Launcher.LaunchUriAsync(new Uri(Parameter.datasheetURL));
-            Parameter.IsLoadingDatasheet = false;
         }
 
         private bool isLoadingDatasheet = true;
