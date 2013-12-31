@@ -22,7 +22,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 {
 	public class DatasheetViewModel : ViewModelBase
 	{
-		//TODO : ajout d'une déclaration de confidentialité !
 		public DatasheetViewModel(INavigationService navigationService)
 			: base(navigationService)
 		{
@@ -118,7 +117,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			StorageFile DatasheetFile;
 			if (response.Content.Headers.ContentType.MediaType == "application/pdf")
 			{
-				DatasheetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Parameter.reference + ".pdf", CreationCollisionOption.ReplaceExisting);
+				DatasheetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Guid.NewGuid().ToString() + ".pdf", CreationCollisionOption.ReplaceExisting);
 
 				using (IRandomAccessStream fs = await DatasheetFile.OpenAsync(FileAccessMode.ReadWrite))
 				{
