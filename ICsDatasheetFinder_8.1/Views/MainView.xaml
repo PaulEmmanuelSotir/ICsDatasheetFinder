@@ -17,7 +17,7 @@
 	</Page.Resources>
 
 	<Grid Style="{StaticResource LayoutRootStyle}">
-		<Hub x:Name="HubView" ScrollViewer.IsHorizontalScrollChainingEnabled="True">
+		<Hub x:Name="HubView">
 			<Hub.Header>
 				<TextBlock Text="{StaticResource AppName}" Style="{StaticResource DatasheetFinderPageHeader}" Grid.Column="1"/>
 			</Hub.Header>

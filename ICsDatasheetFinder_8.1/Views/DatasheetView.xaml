@@ -65,7 +65,7 @@
 			</ItemsControl.ItemsPanel>
 			<ItemsControl.Template>
 				<ControlTemplate>
-					<ScrollViewer ZoomMode="Enabled" MaxZoomFactor="4" 
+					<ScrollViewer ZoomMode="Enabled" MaxZoomFactor="4" MinZoomFactor="0.4"
 						HorizontalScrollMode="Auto" VerticalScrollMode="Auto"
 						VerticalSnapPointsType="None" HorizontalSnapPointsType="None"
 						HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
