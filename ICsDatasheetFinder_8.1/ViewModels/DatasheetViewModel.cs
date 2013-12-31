@@ -111,10 +111,9 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 		private async Task<StorageFile> DownloadDatasheet()
 		{
-			// TODO : comprendre ce qui se passe avec par ex : BSC100... à prioris c'est l'acceptation de la licence infineon
 			// TODO : faire une déclaration de confidentialité
 			HttpClient client = new HttpClient();
-			client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
+			client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
 			HttpResponseMessage response = await client.GetAsync(Parameter.datasheetURL);
 			StorageFile DatasheetFile;
 			if (response.Content.Headers.ContentType.MediaType == "application/pdf")
@@ -231,7 +230,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			private set
 			{
 				datasheetPages = value;
-				// TODO : verifier que cette notification est bonne 
 				NotifyOfPropertyChange<BindableCollection<DatasheetPage>>(() => DatasheetPages);
 			}
 		}

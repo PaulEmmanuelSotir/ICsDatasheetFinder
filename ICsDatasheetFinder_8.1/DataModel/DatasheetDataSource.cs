@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using SQLite;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage;
 using Windows.UI.Core;
 
 namespace ICsDatasheetFinder_8._1.Data
@@ -36,9 +37,8 @@ namespace ICsDatasheetFinder_8._1.Data
 						// TODO : store task, check exceptions...
 						dispatcher.RunAsync(CoreDispatcherPriority.Low, new DispatchedHandler(() =>
 						{
-							// TODO dans windows 8.1 utiliser StorageFile.IsAvailable
 							manu.Logo = new BitmapImage();
-
+							
 							manu.Logo.ImageFailed += new Windows.UI.Xaml.ExceptionRoutedEventHandler((sender, args) =>
 								{
 									// If manufacturer's logo isn't available, we load a default logo

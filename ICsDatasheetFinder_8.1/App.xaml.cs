@@ -17,8 +17,6 @@ using ICsDatasheetFinder_8._1.Views;
 
 // Pour plus d'informations sur le modèle Application vide, consultez la page http://go.microsoft.com/fwlink/?LinkId=234227
 
-// TODO: ajouer les legal info !!
-
 namespace ICsDatasheetFinder_8._1
 {
     /// <summary>
