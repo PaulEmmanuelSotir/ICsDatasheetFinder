@@ -8,46 +8,58 @@ using Windows.UI.Xaml.Controls;
 
 namespace ICsDatasheetFinder_8._1.Common
 {
-    public class WindowHelper
-    {
-        private Page _page;
+	public delegate void StateChangedEventHandler(object sender, WindowState state);
 
-        public WindowHelper(Page page)
-        {
-            _page = page;
-            _page.Loaded += page_Loaded;
-            _page.Unloaded += page_Unloaded;
-        }
+	public class WindowHelper
+	{
+		private Page _page;
 
-        public IEnumerable<WindowState> States { get; set; }
+		public WindowHelper(Page page)
+		{
+			_page = page;
+			_page.Loaded += page_Loaded;
+			_page.Unloaded += page_Unloaded;
+		}
 
-        private void page_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            Window.Current.SizeChanged += Window_SizeChanged;
-            DetermineState(Window.Current.Bounds.Width, Window.Current.Bounds.Height);
-        }
+		public IEnumerable<WindowState> States { get; set; }
 
-        private void page_Unloaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            Window.Current.SizeChanged -= Window_SizeChanged;
-        }
+		public event StateChangedEventHandler StateChanged;
 
-        private void Window_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
-        {
-            DetermineState(e.Size.Width, e.Size.Height, true);
-        }
+		private void page_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+		{
+			Window.Current.SizeChanged += Window_SizeChanged;
+			DetermineState(Window.Current.Bounds.Width, Window.Current.Bounds.Height);
+		}
 
-        private void DetermineState(double width, double height, bool transitions = false)
-        {
-            var state = States.First(x => x.MatchCriterium(width, height));
-            VisualStateManager.GoToState(_page, state.State, transitions);
-        }
-    }
+		private void page_Unloaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+		{
+			Window.Current.SizeChanged -= Window_SizeChanged;
+		}
 
-    public class WindowState
-    {
-        public string State { get; set; }
+		private void Window_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
+		{
+			DetermineState(e.Size.Width, e.Size.Height, true);
+		}
 
-        public Func<double, double, bool> MatchCriterium { get; set; }
-    }
+		private void DetermineState(double width, double height, bool transitions = false)
+		{
+			var state = States.First(x => x.MatchCriterium(width, height));
+			VisualStateManager.GoToState(_page, state.State, transitions);
+			if (state != CurrentState)
+			{
+				CurrentState = state;
+				if (StateChanged != null)
+					StateChanged.Invoke(this, state);
+			}
+		}
+
+		private WindowState CurrentState;
+	}
+
+	public class WindowState
+	{
+		public string State { get; set; }
+
+		public Func<double, double, bool> MatchCriterium { get; set; }
+	}
 }

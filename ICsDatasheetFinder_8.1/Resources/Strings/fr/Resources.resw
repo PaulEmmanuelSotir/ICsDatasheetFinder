@@ -117,13 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DatasheetOf.Text" xml:space="preserve">
+    <value>Datasheet de </value>
+  </data>
   <data name="ElectronicDatabaseFeaturingHeader.Header" xml:space="preserve">
     <value>Egalement disponnible sur le store :</value>
   </data>
   <data name="EnterAref_TextBlock.Text" xml:space="preserve">
-    <value>Veuillez entrer une reference de circuit integré dont vous cherchez la fiche technique :</value>
+    <value>Veuillez entrer une reference de circuit integré dont vous cherchez la datasheet :</value>
   </data>
-  <data name="EnterAref_TextBox.Watermark" xml:space="preserve">
+  <data name="EnterAref_TextBox.PlaceholderText" xml:space="preserve">
     <value>Reference...</value>
   </data>
   <data name="Legal.Text" xml:space="preserve">
@@ -144,8 +147,14 @@
   <data name="NoDatasheetMessage.Text" xml:space="preserve">
     <value>Aucune datasheet trouvée.</value>
   </data>
+  <data name="OpenPdfButton.Label" xml:space="preserve">
+    <value>Ouvrir le fichier PDF</value>
+  </data>
   <data name="ResultHubHeader.Text" xml:space="preserve">
-    <value>fiche(s) technique(s) trouvée(s) pour "</value>
+    <value>datasheet(s) trouvée(s) pour "</value>
+  </data>
+  <data name="SavePdfButton.Label" xml:space="preserve">
+    <value>Enregistrer le fichier PDF</value>
   </data>
   <data name="SelectAll.Content" xml:space="preserve">
     <value>Tout sélectionner</value>

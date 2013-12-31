@@ -117,13 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DatasheetOf.Text" xml:space="preserve">
+    <value>Datasheet of </value>
+  </data>
   <data name="ElectronicDatabaseFeaturingHeader.Header" xml:space="preserve">
     <value>Also available on the store:</value>
   </data>
   <data name="EnterAref_TextBlock.Text" xml:space="preserve">
     <value>Please enter an integrated circuit reference to find its datasheet:</value>
   </data>
-  <data name="EnterAref_TextBox.Watermark" xml:space="preserve">
+  <data name="EnterAref_TextBox.PlaceholderText" xml:space="preserve">
     <value>Reference...</value>
   </data>
   <data name="Legal.Text" xml:space="preserve">
@@ -144,8 +147,14 @@
   <data name="NoDatasheetMessage.Text" xml:space="preserve">
     <value>No datasheet found.</value>
   </data>
+  <data name="OpenPdfButton.Label" xml:space="preserve">
+    <value>Open PDF file</value>
+  </data>
   <data name="ResultHubHeader.Text" xml:space="preserve">
     <value>datasheet(s) found for "</value>
+  </data>
+  <data name="SavePdfButton.Label" xml:space="preserve">
+    <value>Save PDF file</value>
   </data>
   <data name="SelectAll.Content" xml:space="preserve">
     <value>Select All</value>
