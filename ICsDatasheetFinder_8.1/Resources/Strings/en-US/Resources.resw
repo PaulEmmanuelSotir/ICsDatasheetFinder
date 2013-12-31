@@ -147,6 +147,9 @@
   <data name="NoDatasheetMessage.Text" xml:space="preserve">
     <value>No datasheet found.</value>
   </data>
+  <data name="NoManufacturerSelectedMessage.Text" xml:space="preserve">
+    <value>No manufacturer selected !</value>
+  </data>
   <data name="OpenPdfButton.Label" xml:space="preserve">
     <value>Open PDF file</value>
   </data>

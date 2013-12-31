@@ -97,6 +97,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			CurrentTokenSource = new CancellationTokenSource();
 			PreviousTokenSource = CurrentTokenSource;
 
+			IsZeroManufacturerSelected = false;
 			IsEmptyResult = false;
 			// TODO : règler le problème d'affichage de "0 datasheet trouvées" pendant la recherche !
 			IsMoreResult = false;
@@ -144,9 +145,15 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 				CurrentTokenSource.Token.ThrowIfCancellationRequested();
 				if (Datasheets.Count == 0)
-					IsEmptyResult = true;
+					if (ManufacturerSelectionEnabled && selectedManufacturers.Count == 0)
+						IsZeroManufacturerSelected = true;
+					else
+						IsEmptyResult = true;
 				else
+				{
+					IsZeroManufacturerSelected = false;
 					IsEmptyResult = false;
+				}
 			}
 			catch (OperationCanceledException) { }
 		}
@@ -254,7 +261,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		{
 			get
 			{
-				return isEmptyResult;
+				return isEmptyResult && !isZeroManufacturerSelected;
 			}
 			set
 			{
@@ -263,6 +270,21 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			}
 		}
 		private bool isEmptyResult = false;
+
+		private bool isZeroManufacturerSelected = false;
+		public bool IsZeroManufacturerSelected
+		{
+			get
+			{
+				return isZeroManufacturerSelected && !isEmptyResult;
+			}
+			set
+			{
+				isZeroManufacturerSelected = value;
+				NotifyOfPropertyChange<bool>(() => IsZeroManufacturerSelected);
+			}
+		}
+
 		public bool IsProcesssing
 		{
 			get
@@ -276,7 +298,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			}
 		}
 		private bool isProcessing = false;
-
 
 		private const int FIRST_SEARCH_RANGE = 120;
 

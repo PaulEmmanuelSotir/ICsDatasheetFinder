@@ -69,7 +69,10 @@
 								  Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Padding="40,20,0,20" Margin="0,0,0,40"
 								  cal:Message.Attach="[Event ItemClick] = [SeeDatasheet($eventArgs)]" HorizontalContentAlignment="Left" VerticalContentAlignment="Top">
 							<GridView.Header>
-								<TextBlock x:Uid="NoDatasheetMessage" Visibility="{Binding IsEmptyResult, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource SubheaderTextStyle}" Text="Aucune datasheet trouvée." Margin="0,0,40,0"/>
+								<Grid Margin="0,0,40,0">
+									<TextBlock x:Uid="NoDatasheetMessage" Visibility="{Binding IsEmptyResult, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource SubheaderTextStyle}" Text="Aucune datasheet trouvée."/>
+									<TextBlock x:Uid="NoManufacturerSelectedMessage" Visibility="{Binding IsZeroManufacturerSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Style="{StaticResource SubheaderTextStyle}" Foreground="{StaticResource MainAppBrush}" FontWeight="Normal"/>
+								</Grid>
 							</GridView.Header>
 							<GridView.ItemTemplate>
 								<DataTemplate>
