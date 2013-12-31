@@ -9,7 +9,6 @@
 	xmlns:Converters="using:ICsDatasheetFinder_8._1.Converters" x:Name="page"
 	x:Class="ICsDatasheetFinder_8._1.Views.MainView"
 	mc:Ignorable="d">
-	<!--cal:Message.Attach="[Event SizeChanged] = [PageSizeChanged($source, $eventArgs)]">-->
 	<Page.Resources>
 		<Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 		<Converters:BooleanNegationConverter x:Key="BooleanNegationConverter"/>
@@ -19,12 +18,11 @@
 
 	<Grid Style="{StaticResource LayoutRootStyle}">
 		<Hub x:Name="HubView" ScrollViewer.IsHorizontalScrollChainingEnabled="True">
-			<!--Orientation="{Binding HubOrientation}">-->
 			<Hub.Header>
 				<TextBlock Text="{StaticResource AppName}" Style="{StaticResource DatasheetFinderPageHeader}" Grid.Column="1"/>
 			</Hub.Header>
 
-			<HubSection x:Name="InputHubSection" Width="550" Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+			<HubSection x:Name="InputHubSection" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" VerticalContentAlignment="Stretch">
 				<DataTemplate>
 					<Grid>
 						<Grid.RowDefinitions>
@@ -87,8 +85,6 @@
 								</Style>
 							</GridView.ItemContainerStyle>
 						</GridView>
-
-
 					</Grid>
 				</DataTemplate>
 			</HubSection>
@@ -203,6 +199,9 @@
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="Width">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="1200"/>
 						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="InputHubSection" Storyboard.TargetProperty="Width">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="550"/>
+						</ObjectAnimationUsingKeyFrames>
 					</Storyboard>
 				</VisualState>
 				<VisualState x:Name="Vertical">
@@ -213,33 +212,35 @@
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="MaxHeight">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="1000"/>
 						</ObjectAnimationUsingKeyFrames>
+						
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="HorizontalAlignment">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="Stretch"/>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="InputHubSection" Storyboard.TargetProperty="HorizontalAlignment">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="Stretch"/>
 						</ObjectAnimationUsingKeyFrames>
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="VerticalContentAlignment">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="Top"/>
 						</ObjectAnimationUsingKeyFrames>
+						
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ElectronicDatabaseFeaturingHubSection" Storyboard.TargetProperty="Visibility">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
 						</ObjectAnimationUsingKeyFrames>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="InputHubSection" Storyboard.TargetProperty="HorizontalAlignment">
-							<DiscreteObjectKeyFrame KeyTime="0" Value="Left"/>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ResultHubHeader" Storyboard.TargetProperty="Text">
+							<DiscreteObjectKeyFrame KeyTime="0" x:Uid="VerticalResultHubHeader"/>
 						</ObjectAnimationUsingKeyFrames>
 
-
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="InputHubSection" Storyboard.TargetProperty="Margin">
-							<DiscreteObjectKeyFrame KeyTime="0" Value="20,0,20,0"/>
+							<DiscreteObjectKeyFrame KeyTime="0" Value="40,0"/>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="InputHubSection" Storyboard.TargetProperty="Padding">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="40,40,40,44"/>
 						</ObjectAnimationUsingKeyFrames>
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="DatasheetsHubSection" Storyboard.TargetProperty="Padding">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="40,40,40,44"/>
 						</ObjectAnimationUsingKeyFrames>
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ManufacturersHubSection" Storyboard.TargetProperty="Padding">
 							<DiscreteObjectKeyFrame KeyTime="0" Value="40,40,40,44"/>
-						</ObjectAnimationUsingKeyFrames>
-
-
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ResultHubHeader" Storyboard.TargetProperty="Text">
-							<DiscreteObjectKeyFrame KeyTime="0" x:Uid="VerticalResultHubHeader"/>
 						</ObjectAnimationUsingKeyFrames>
 					</Storyboard>
 				</VisualState>
