@@ -82,7 +82,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 									await pdfPage.RenderToStreamAsync(randomStream);
 									await randomStream.FlushAsync();
 									randomStream.Dispose();
-									DatasheetPage page = new DatasheetPage(pdfPage.Index + 1, pngFile.Path);
+									DatasheetPage page = new DatasheetPage(pdfPage.Index + 1, pdfPage.Dimensions.ArtBox, pngFile.Path);
 									pdfPage.Dispose();
 
 									datasheetPages.Add(page);

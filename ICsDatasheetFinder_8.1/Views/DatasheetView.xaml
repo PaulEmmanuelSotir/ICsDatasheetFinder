@@ -82,18 +82,21 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 						<Viewbox MaxHeight="1024" HorizontalAlignment="Center" VerticalAlignment="Top">
-							<Image Source="{Binding PageImage}" Stretch="Uniform">
-								<Image.Transitions>
-									<TransitionCollection>
-										<AddDeleteThemeTransition/>
-									</TransitionCollection>
-								</Image.Transitions>
-							</Image>
+							<Grid>
+								<Rectangle Fill="White" Height="{Binding Height}" Width="{Binding Width}"/>
+								<Image Source="{Binding PageImage}" Stretch="Uniform"/>
+							</Grid>
 						</Viewbox>
+						
 						<TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Style="{StaticResource TitleTextBlockStyle}" Foreground="White">
 							<Run Text="Page "/>
 							<Run Text="{Binding PageNumber}"/>
 						</TextBlock>
+						<Grid.Transitions>
+							<TransitionCollection>
+								<AddDeleteThemeTransition/>
+							</TransitionCollection>
+						</Grid.Transitions>
 					</Grid>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
