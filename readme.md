@@ -16,3 +16,7 @@ KEYWORDS:
 datasheet IC database electronic part integrated circuits
 
 MOTS-CLE :
+
+Liens des déclarations de confidentialité :
+http://paulemmanuelsotir.github.io/Datasheet-Finder---Privacy-Policy/PolitiqueDeConfidentialit%C3%A9.html
+http://paulemmanuelsotir.github.io/Datasheet-Finder---Privacy-Policy/PrivacyPolicy.html

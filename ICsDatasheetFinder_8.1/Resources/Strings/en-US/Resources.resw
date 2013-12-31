@@ -150,6 +150,12 @@
   <data name="OpenPdfButton.Label" xml:space="preserve">
     <value>Open PDF file</value>
   </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="PrivacyPolicyURL" xml:space="preserve">
+    <value>http://paulemmanuelsotir.github.io/Datasheet-Finder---Privacy-Policy/PrivacyPolicy.html</value>
+  </data>
   <data name="ResultHubHeader.Text" xml:space="preserve">
     <value>datasheet(s) found for "</value>
   </data>

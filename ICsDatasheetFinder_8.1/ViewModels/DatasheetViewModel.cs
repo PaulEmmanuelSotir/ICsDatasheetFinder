@@ -111,7 +111,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 		private async Task<StorageFile> DownloadDatasheet()
 		{
-			// TODO : faire une déclaration de confidentialité
+			// Lien de la déclaration de confidentialité : "http://ma.ms.giz.fr/?name=Datasheet+Finder"
 			HttpClient client = new HttpClient();
 			client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
 			HttpResponseMessage response = await client.GetAsync(Parameter.datasheetURL);

@@ -150,6 +150,12 @@
   <data name="OpenPdfButton.Label" xml:space="preserve">
     <value>Ouvrir le fichier PDF</value>
   </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>Politique de confidentialité</value>
+  </data>
+  <data name="PrivacyPolicyURL" xml:space="preserve">
+    <value>http://paulemmanuelsotir.github.io/Datasheet-Finder---Privacy-Policy/PolitiqueDeConfidentialit%C3%A9.html</value>
+  </data>
   <data name="ResultHubHeader.Text" xml:space="preserve">
     <value>datasheet(s) trouvée(s) pour "</value>
   </data>
