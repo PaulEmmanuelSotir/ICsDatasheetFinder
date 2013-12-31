@@ -89,7 +89,6 @@
 				</DataTemplate>
 			</HubSection>
 
-			<!--TODO : changer le violet de la selection des manufacturers-->
 			<HubSection x:Name="ManufacturersHubSection" x:Uid="ManufacturersHubHeader" Header="Manufacturers" VerticalContentAlignment="Stretch">
 				<HubSection.HeaderTemplate>
 					<DataTemplate>

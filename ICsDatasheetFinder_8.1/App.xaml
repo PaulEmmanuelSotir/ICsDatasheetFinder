@@ -8,10 +8,9 @@
 
     <Application.Resources>
         <ResourceDictionary>
-            <x:String x:Key="AppName">Datasheet Finder</x:String>
-        <!--TODO: Enlever ça si c'est inutile !-->   <!--<x:String x:Key="ElectronicDatabaseURL">ICs Datasheet Finder</x:String>-->
+			<x:String x:Key="AppName">Datasheet Finder</x:String>
 
-            <!--APP COLORS-->
+			<!--APP COLORS-->
             <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush2" Color="#FFC8C8C8"/>
             <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush" Color="#FFE6E6E6"/>
             <SolidColorBrush x:Key="MainAppBrush" Color="#FFD45500"/>
@@ -102,9 +101,17 @@
             <SolidColorBrush x:Key="ToggleSwitchCurtainPressedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource ThirdAppBrush}}"/>
             <!--PROGRESS BAR-->
             <SolidColorBrush x:Key="ProgressBarForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            
-            <!-- ######## A REUTILISER A L'OCCASION DANS LES NOUVEAUX STYLES ######## -->
+			<SolidColorBrush x:Key="ProgressBarIndeterminateForegroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+			<!--LIST VIEW/GRID VIEW-->
+            <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+            <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBorderThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+            <SolidColorBrush x:Key="ListViewItemSelectedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+			<SolidColorBrush x:Key="ListViewItemPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush2}}"/>
+            <SolidColorBrush x:Key="ListViewItemCheckHintThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+            <SolidColorBrush x:Key="ListViewItemCheckSelectingThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
+			<SolidColorBrush x:Key="ListViewItemDragBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource ForegroundPointerOverBrush4}}"/>
+
+			<!-- ######## A REUTILISER A L'OCCASION DANS LES NOUVEAUX STYLES ######## -->
             <!--TITLE BUTTON-->
             <!--ButtonBorderThemeBrush
             -->
@@ -117,16 +124,6 @@
             <!--
             <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
             <SolidColorBrush x:Key="ListBoxItemSelectedPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource BackgroundPointerOverBrush}}"/>
-            -->
-            <!--LIST VIEW/GRID VIEW-->
-            <!--
-            <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBorderThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ListViewItemSelectedBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ListViewItemPointerOverBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource SecondAppBrush}}"/>
-            <SolidColorBrush x:Key="ListViewItemCheckHintThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ListViewItemCheckSelectingThemeBrush" Color="{Binding Color, Source={StaticResource MainAppBrush}}"/>
-            <SolidColorBrush x:Key="ListViewItemDragBackgroundThemeBrush" Color="{Binding Color, Source={StaticResource ForegroundPointerOverBrush}}"/>
             -->
             <!--SLIDER-->
             <!--
