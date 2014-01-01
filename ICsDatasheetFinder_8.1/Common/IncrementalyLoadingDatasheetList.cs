@@ -17,22 +17,19 @@ namespace ICsDatasheetFinder_8._1.Common
 
 		protected async override Task<IList<object>> LoadMoreItemsOverrideAsync(System.Threading.CancellationToken c, uint count)
 		{
-			//TODO : corriger le bug du 'only one operation at time allowed' de LoadMoreItems dans IncrementalLoadingBase
-
 			uint ToDo = System.Math.Min((uint)count, (uint)DatasheetList.Count - doneCount);
 			var rslt = DatasheetList.GetRange((int)doneCount, (int)ToDo);
 
 			doneCount += ToDo;
 
-			return await Task.Run(() =>
+			await Task.Run(() =>
 			{
 				Parallel.ForEach(rslt, (part) =>
 				{
 					part.ManufacturerName = Manufacturers.Find(manu => manu.Id == part.ManufacturerId).name;
 				});
-
-				return rslt.ToList<object>();
 			});
+			return rslt.ToList<object>();
 
 		}
 

@@ -90,6 +90,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		private CancellationTokenSource CurrentTokenSource = new CancellationTokenSource();
 		private CancellationTokenSource PreviousTokenSource;
 
+		// TODO : quand on recherche avec tout les résultats, conserver seulement les manufacturers concernés
 		private async void QueryForDatasheets(object sender)
 		{
 			if (PreviousTokenSource != null)
@@ -99,7 +100,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 			IsZeroManufacturerSelected = false;
 			IsEmptyResult = false;
-			// TODO : règler le problème d'affichage de "0 datasheet trouvées" pendant la recherche !
+			// TODO : règler le problème d'affichage de "0 datasheet trouvées" pendant la recherche ! (cf TODO dans le XAML)
 			IsMoreResult = false;
 
 			if (sender != this)
@@ -228,7 +229,8 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				if (value != query)
 				{
 					query = value;
-					NotifyOfPropertyChange<String>(() => Query);
+					NotifyOfPropertyChange("Query");
+					//NotifyOfPropertyChange<String>(() => Query);
 					NotifyOfPropertyChange<bool>(() => IsAnyQuery);
 				}
 			}

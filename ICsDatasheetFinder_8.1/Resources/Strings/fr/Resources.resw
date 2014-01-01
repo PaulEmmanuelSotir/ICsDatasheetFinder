@@ -142,13 +142,13 @@
     <value>Fabricants</value>
   </data>
   <data name="MoreResultButton.Content" xml:space="preserve">
-    <value>Chercher plus de datasheets</value>
+    <value>Afficher tous les résultats</value>
   </data>
   <data name="NoDatasheetMessage.Text" xml:space="preserve">
     <value>Aucune datasheet trouvée.</value>
   </data>
   <data name="NoManufacturerSelectedMessage.Text" xml:space="preserve">
-    <value>Aucun fabricants sélectionnés !</value>
+    <value>Aucun fabricant sélectionné !</value>
   </data>
   <data name="OpenPdfButton.Label" xml:space="preserve">
     <value>Ouvrir le fichier PDF</value>

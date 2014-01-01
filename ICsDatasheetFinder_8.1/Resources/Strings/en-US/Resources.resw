@@ -142,7 +142,7 @@
     <value>Manufacturers</value>
   </data>
   <data name="MoreResultButton.Content" xml:space="preserve">
-    <value>Find more datasheets</value>
+    <value>Display all results</value>
   </data>
   <data name="NoDatasheetMessage.Text" xml:space="preserve">
     <value>No datasheet found.</value>

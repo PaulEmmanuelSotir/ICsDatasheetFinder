@@ -22,6 +22,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 {
 	public class DatasheetViewModel : ViewModelBase
 	{
+		// TODO : restaurer l'état de la mainView quand on "goBack"
 		public DatasheetViewModel(INavigationService navigationService)
 			: base(navigationService)
 		{
