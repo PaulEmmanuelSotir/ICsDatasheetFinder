@@ -86,8 +86,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				}
 			}
 		}
-
-		private CancellationTokenSource CurrentTokenSource = new CancellationTokenSource();
+		
 		private CancellationTokenSource PreviousTokenSource;
 
 		// TODO : quand on recherche avec tout les résultats, conserver seulement les manufacturers concernés
@@ -95,7 +94,9 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		{
 			if (PreviousTokenSource != null)
 				PreviousTokenSource.Cancel(true);
-			CurrentTokenSource = new CancellationTokenSource();
+			// TODO : wait for the canceled task (task cancelling is not instantaneous !)
+
+			var CurrentTokenSource = new CancellationTokenSource();
 			PreviousTokenSource = CurrentTokenSource;
 
 			IsZeroManufacturerSelected = false;
@@ -103,16 +104,18 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// TODO : règler le problème d'affichage de "0 datasheet trouvées" pendant la recherche ! (cf TODO dans le XAML)
 			IsMoreResult = false;
 
-			if (sender != this)
-			{
+			if (sender != this) // MVVM paradigm violation !!
 				Query = (sender as TextBox).Text;
-			}
+			
 			try
 			{
 				if (IsAnyQuery)
 				{
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
 					IsProcesssing = true;
+
+					// the task cannot be canceled here because an async function run synchronously until the first await.
+					// Moreover, as "datasheets" collection cleaning is necessary whether the task was cancelled or not, there is no 
+					// need to try to prevent it.
 
 					if (datasheets.Count != 0)
 					{
@@ -120,48 +123,61 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 						NotifyOfPropertyChange<int>(() => DatasheetsCount);
 					}
 
-					await Task.Factory.StartNew(() =>
-					{
-						if (ManufacturerSelectionEnabled)
-							return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, selectedManufacturers, FIRST_SEARCH_RANGE);
-						return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, FIRST_SEARCH_RANGE);
-					}, CurrentTokenSource.Token).ContinueWith(async (ResultingTask) =>
-					{
-						CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					var result = await Task.Factory.StartNew(() =>
+									{
+										if (ManufacturerSelectionEnabled)
+											return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, selectedManufacturers, FIRST_SEARCH_RANGE);
+										return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, FIRST_SEARCH_RANGE);
+									}, CurrentTokenSource.Token);
 
-						Datasheets.UnionWith(ResultingTask.Result);
-						NotifyOfPropertyChange<int>(() => DatasheetsCount);
-						var rslt = (from t in Manufacturers from manu in t select manu).ToList<Manufacturer>();
-						ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), rslt);
-						IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
+					CurrentTokenSource.Token.ThrowIfCancellationRequested();
 
-						CurrentTokenSource.Token.ThrowIfCancellationRequested();
-						await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
-					}, CurrentTokenSource.Token, TaskContinuationOptions.NotOnCanceled, TaskScheduler.FromCurrentSynchronizationContext());
+					//ajout des résultats de recherche dans la liste:
+					Datasheets.UnionWith(result);
+					NotifyOfPropertyChange<int>(() => DatasheetsCount);
 
+					// liste de tous les Manufacturers, /!\ maybe the list shall be saved for future used, saving some processing power at each request...
+					// or maybe the correspondance between component and manufacturer should be done directly here, in the linq request
+					var rslt = (from t in Manufacturers from manu in t select manu).ToList<Manufacturer>();
+
+					// preparation de l'incremental loading et affichage de la première tranche.
+					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), rslt);
+					IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
+					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
 
 					CurrentTokenSource.Token.ThrowIfCancellationRequested();
 					IsProcesssing = false;
 				}
 
 				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+
 				if (Datasheets.Count == 0)
+				{
 					if (ManufacturerSelectionEnabled && selectedManufacturers.Count == 0)
 						IsZeroManufacturerSelected = true;
 					else
 						IsEmptyResult = true;
+				}
 				else
 				{
 					IsZeroManufacturerSelected = false;
 					IsEmptyResult = false;
 				}
 			}
-			catch (OperationCanceledException) { }
+			catch (OperationCanceledException) {
+				//maybe requires "IsProcesssing = false;" ??
+			}
 		}
 
 		private async void FindMoreResults()
 		{
-			CurrentTokenSource = new CancellationTokenSource();
+			// prevent any double task
+			if (PreviousTokenSource != null)
+				PreviousTokenSource.Cancel(true);
+			//TODO : wait the canceled task.
+
+			var CurrentTokenSource = new CancellationTokenSource();
 			PreviousTokenSource = CurrentTokenSource;
 
 			try
