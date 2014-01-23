@@ -53,7 +53,11 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		/// </summary>
 		private void SeeDatasheet(ItemClickEventArgs e)
 		{
-			GoTo<DatasheetViewModel>(e.ClickedItem as Part);
+			Part part = e.ClickedItem as Part;
+			navigationService.UriFor<DatasheetViewModel>()
+				.WithParam<String>((instance) => instance.DatasheetURL, part.datasheetURL)
+				.WithParam<String>((instance) => instance.PartReference, part.reference)
+				.Navigate();
 		}
 
 		/// <summary>
@@ -74,6 +78,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// Cancel old datasheet queries and create a new CancellationTokenSource
 			if (PreviousTokenSource != null)
 				PreviousTokenSource.Cancel(true);
+			// TODO : wait for the canceled task (task cancelling is not instantaneous !)
 			CurrentTokenSource = new CancellationTokenSource();
 			PreviousTokenSource = CurrentTokenSource;
 
@@ -95,26 +100,25 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 						NotifyOfPropertyChange<int>(() => DatasheetsCount);
 					}
 
-					await Task.Factory.StartNew(() =>
+					IList<Part> data = await Task.Factory.StartNew(() =>
 					{
 						if (ManufacturerSelectionEnabled)
 							return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, selectedManufacturers, FIRST_SEARCH_RANGE);
 						return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, FIRST_SEARCH_RANGE);
-					}, CurrentTokenSource.Token).ContinueWith(async (ResultingTask) =>
-					{
-						CurrentTokenSource.Token.ThrowIfCancellationRequested();
-
-						Datasheets.UnionWith(ResultingTask.Result);
-						NotifyOfPropertyChange<int>(() => DatasheetsCount);
-						ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
-						IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
-
-						CurrentTokenSource.Token.ThrowIfCancellationRequested();
-						await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
-					}, CurrentTokenSource.Token, TaskContinuationOptions.NotOnCanceled, TaskScheduler.FromCurrentSynchronizationContext());
-
+					}, CurrentTokenSource.Token);
 
 					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+
+					Datasheets.UnionWith(data);
+					NotifyOfPropertyChange<int>(() => DatasheetsCount);
+					// preparation de l'incremental loading et affichage de la première page.
+					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
+					IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
+
+					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
+					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+
 					IsProcesssing = false;
 				}
 
@@ -162,6 +166,10 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		}
 		private async void FindMoreResults()
 		{
+			// prevent any double task
+			if (PreviousTokenSource != null)
+				PreviousTokenSource.Cancel(true);
+			//TODO : wait the canceled task.
 			CurrentTokenSource = new CancellationTokenSource();
 			PreviousTokenSource = CurrentTokenSource;
 
@@ -170,25 +178,25 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				CurrentTokenSource.Token.ThrowIfCancellationRequested();
 				IsProcesssing = true;
 
-				await Task.Factory.StartNew(() =>
+				var data = await Task.Factory.StartNew(() =>
 				{
 					if (ManufacturerSelectionEnabled)
 						return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, selectedManufacturers);
 					return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token);
-				}, CurrentTokenSource.Token).ContinueWith(async (ResultingTask) =>
-				{
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
-					datasheets.Clear();
-					Datasheets.UnionWith(ResultingTask.Result);
-					NotifyOfPropertyChange<int>(() => DatasheetsCount);
-					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
-					IsMoreResult = false;
-
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
-					await ViewDatasheets.LoadMoreItemsAsync(120);
-				}, CurrentTokenSource.Token, TaskContinuationOptions.NotOnCanceled, TaskScheduler.FromCurrentSynchronizationContext());
+				}, CurrentTokenSource.Token);
 
 				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+
+				datasheets.Clear();
+				Datasheets.UnionWith(data);
+				NotifyOfPropertyChange<int>(() => DatasheetsCount);
+				ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
+				IsMoreResult = false;
+
+				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+				await ViewDatasheets.LoadMoreItemsAsync(120);
+				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+
 				IsProcesssing = false;
 			}
 			catch (OperationCanceledException) { }
@@ -200,7 +208,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// Ecrit la requete issue du search panel dans la TextBox
 			if (Query != string.Empty)
 			{
-				//	txtBox.Text = Query;
+				txtBox.Text = Query;
 				// Place le curseur à la fin du texte
 				txtBox.Select(txtBox.Text.Length, 0);
 			}

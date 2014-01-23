@@ -32,19 +32,34 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			});
 		}
 
-		private Part parameter;
-		public Part Parameter
+		private String datasheetURL;
+		public String DatasheetURL
 		{
 			get
 			{
-				return parameter;
+				return datasheetURL;
 			}
 			set
 			{
-				parameter = value;
-				NotifyOfPropertyChange("Parameter");
+				datasheetURL = value;
+				NotifyOfPropertyChange("DatasheetURL");
 			}
 		}
+
+		private String partReference;
+		public String PartReference
+		{
+			get
+			{
+				return partReference;
+			}
+			set
+			{
+				partReference = value;
+				NotifyOfPropertyChange("PartReference");
+			}
+		}
+		
 
 		private async void LoadDatasheet()
 		{
@@ -114,7 +129,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// Lien de la déclaration de confidentialité : "http://ma.ms.giz.fr/?name=Datasheet+Finder"
 			HttpClient client = new HttpClient();
 			client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
-			HttpResponseMessage response = await client.GetAsync(Parameter.datasheetURL);
+			HttpResponseMessage response = await client.GetAsync(DatasheetURL);
 			StorageFile DatasheetFile;
 			if (response.Content.Headers.ContentType.MediaType == "application/pdf")
 			{
@@ -147,7 +162,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 		private async Task SeeDatasheetOnBrowser()
 		{
-			await Launcher.LaunchUriAsync(new Uri(Parameter.datasheetURL));
+			await Launcher.LaunchUriAsync(new Uri(DatasheetURL));
 		}
 
 		private async void OpenPDF()
