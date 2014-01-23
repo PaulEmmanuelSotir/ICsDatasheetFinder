@@ -12,7 +12,7 @@ using Windows.UI.Xaml;
 
 namespace ICsDatasheetFinder_8._1.ViewModels
 {
-	public class MainViewModel : ViewModelBase
+	public sealed class MainViewModel : ViewModelBase
 	{
 		public MainViewModel(INavigationService navigationService)
 			: base(navigationService)
@@ -20,79 +20,58 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			Manufacturers = new BindableCollection<IGrouping<char, Manufacturer>>();
 			selectedManufacturers = new List<Manufacturer>();
 			datasheets = new HashSet<Part>();
+
+			// Update found datasheets if query or selected manufacturers changed
 			this.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler((obj, Args) =>
 			{
-				if (Args.PropertyName == "ManufacturerSelectionEnabled")
-					QueryForDatasheets(this);
+				if (Args.PropertyName == "ManufacturerSelectionEnabled" || Args.PropertyName == "selectedManufacturers" || Args.PropertyName == "Query")
+					QueryForDatasheets();
 			});
-		}
-
-		private string parameter;
-		public string Parameter
-		{
-			get
-			{
-				return parameter;
-			}
-			set
-			{
-				parameter = value;
-				NotifyOfPropertyChange();
-			}
 		}
 
 		protected override async void OnInitialize()
 		{
 			base.OnInitialize();
 
+			// If page have been launched by search panel we query database. Results are automaticly updated (see MainViewModel constructor) so we have to be aware that
+			// manufacturers will not be used in 'QueryForDatasheets' as they aren't loaded yet.
 			Query = Parameter ?? "";
+
 			await Task.Factory.StartNew(() =>
 			{
 				Manufacturers.AddRange(DatasheetDataSource.GetManufacturers());
+				// Get ungrouped manufacters
+				ungroupedManufacters = (from manusGroupedByLetter in Manufacturers from manu in manusGroupedByLetter select manu).ToList<Manufacturer>();
 			});
+
 			// Load manufacturers logos
 			await DatasheetDataSource.LoadManufacturersImagesAsync();
-
-			if (Query != string.Empty)
-				QueryForDatasheets(this);
 		}
 
+		/// <summary>
+		/// Navigates to DatasheetView in order to display datasheet.
+		/// </summary>
 		private void SeeDatasheet(ItemClickEventArgs e)
 		{
 			GoTo<DatasheetViewModel>(e.ClickedItem as Part);
 		}
 
+		/// <summary>
+		/// Ask windows store to display Electronic database app sheet
+		/// </summary>
 		private async void SeeElecDatabase()
 		{
 			await Launcher.LaunchUriAsync(new Uri("ms-windows-store:PDP?PFN=45311Paul-EmmanuelSotir.ElectronicDatabase_7q75p07zxm5km"));
 		}
 
-		private void UpdateManufacturerSelection(SelectionChangedEventArgs e)
-		{
-			foreach (Manufacturer manu in e.AddedItems)
-			{
-				if (!selectedManufacturers.Contains(manu))
-				{
-					selectedManufacturers.Add(manu);
-					QueryForDatasheets(this);
-				}
-			}
-			foreach (Manufacturer manu in e.RemovedItems)
-			{
-				if (selectedManufacturers.Contains(manu))
-				{
-					selectedManufacturers.Remove(manu);
-					QueryForDatasheets(this);
-				}
-			}
-		}
-
-		private CancellationTokenSource CurrentTokenSource = new CancellationTokenSource();
-		private CancellationTokenSource PreviousTokenSource;
-
 		// TODO : quand on recherche avec tout les résultats, conserver seulement les manufacturers concernés
-		private async void QueryForDatasheets(object sender)
+		/// <summary>
+		/// Searches matching part datasheet in SQLite database. 
+		/// The criteria used to query the database are the selected manufacturers and the user query (from 'selectedManufacturers' and 'Query').
+		/// </summary>
+		private async void QueryForDatasheets()
 		{
+			// Cancel old datasheet queries and create a new CancellationTokenSource
 			if (PreviousTokenSource != null)
 				PreviousTokenSource.Cancel(true);
 			CurrentTokenSource = new CancellationTokenSource();
@@ -103,10 +82,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// TODO : règler le problème d'affichage de "0 datasheet trouvées" pendant la recherche ! (cf TODO dans le XAML)
 			IsMoreResult = false;
 
-			if (sender != this)
-			{
-				Query = (sender as TextBox).Text;
-			}
 			try
 			{
 				if (IsAnyQuery)
@@ -131,8 +106,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 						Datasheets.UnionWith(ResultingTask.Result);
 						NotifyOfPropertyChange<int>(() => DatasheetsCount);
-						var rslt = (from t in Manufacturers from manu in t select manu).ToList<Manufacturer>();
-						ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), rslt);
+						ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
 						IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
 
 						CurrentTokenSource.Token.ThrowIfCancellationRequested();
@@ -159,6 +133,33 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			catch (OperationCanceledException) { }
 		}
 
+		/// <summary>
+		/// Manually synchronizes selected manufacturers of view and the 'selectedManufacturers' collection.
+		/// </summary>
+		private void UpdateManufacturerSelection(SelectionChangedEventArgs e)
+		{
+			foreach (Manufacturer manu in e.AddedItems)
+				if (!selectedManufacturers.Contains(manu))
+					selectedManufacturers.Add(manu);
+
+			foreach (Manufacturer manu in e.RemovedItems)
+				if (selectedManufacturers.Contains(manu))
+					selectedManufacturers.Remove(manu);
+		}
+
+		public void UserQueryChanged(object sender)
+		{
+			// doesn't throws exceptions: if(sender == null) => (sender is TextBox) == false
+			if (sender is TextBox)
+			{
+				string input = (sender as TextBox).Text;
+
+				// Avoid SQLite misunderstanding due to ' character in the query
+				if (input.Contains('\''))
+					input = input.Replace("\'", "");
+				Query = input.Trim();
+			}
+		}
 		private async void FindMoreResults()
 		{
 			CurrentTokenSource = new CancellationTokenSource();
@@ -180,8 +181,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 					datasheets.Clear();
 					Datasheets.UnionWith(ResultingTask.Result);
 					NotifyOfPropertyChange<int>(() => DatasheetsCount);
-					var rslt = (from t in Manufacturers from manu in t select manu).ToList<Manufacturer>();
-					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), rslt);
+					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
 					IsMoreResult = false;
 
 					CurrentTokenSource.Token.ThrowIfCancellationRequested();
@@ -200,42 +200,66 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// Ecrit la requete issue du search panel dans la TextBox
 			if (Query != string.Empty)
 			{
-				txtBox.Text = Query;
+				//	txtBox.Text = Query;
 				// Place le curseur à la fin du texte
 				txtBox.Select(txtBox.Text.Length, 0);
 			}
+			// TODO : vérifier que PreventKeyboardDisplayOnProgrammaticFocus ne doit pas être plutôt mit à true !
 			txtBox.PreventKeyboardDisplayOnProgrammaticFocus = false;
 			txtBox.Focus(FocusState.Programmatic);
 		}
+
+		#region Attributes
 
 		public BindableCollection<IGrouping<char, Manufacturer>> Manufacturers
 		{
 			get;
 			private set;
 		}
+		private List<Manufacturer> ungroupedManufacters
+		{
+			get;
+			set;
+		}
 
-		public String Query
+		// TODO : tester le search panel à la fin
+		/// <summary>
+		/// Parameter is a string representing a query from the search panel.
+		/// The name 'Parameter' is automatically recognized and initialized by caliburn micro.
+		/// </summary>
+		public string Parameter
+		{
+			get
+			{
+				return parameter;
+			}
+			set
+			{
+				parameter = value;
+				NotifyOfPropertyChange("Parameter");
+			}
+		}
+		private string parameter;
+
+		public string Query
 		{
 			get
 			{
 				return query;
 			}
-			set
+			private set
 			{
-				if (value.Contains('\''))
-					value = value.Replace("\'", "");
-				value = value.Trim();
-
 				if (value != query)
 				{
 					query = value;
+					// TODO : comprendre lequel des deux types de notifications est le meilleur :
 					NotifyOfPropertyChange("Query");
-					//NotifyOfPropertyChange<String>(() => Query);
+					//NotifyOfPropertyChange<string>(() => Query);
 					NotifyOfPropertyChange<bool>(() => IsAnyQuery);
 				}
 			}
 		}
-		private String query;
+		private string query;
 		public bool IsAnyQuery
 		{
 			get
@@ -301,8 +325,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		}
 		private bool isProcessing = false;
 
-		private const int FIRST_SEARCH_RANGE = 120;
-
 		public int DatasheetsCount
 		{
 			get
@@ -352,5 +374,13 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		private bool manufacturerSelectionEnabled;
 
 		private IList<Manufacturer> selectedManufacturers;
+
+		private const int FIRST_SEARCH_RANGE = 120;
+
+		// Cancellation Token used to cancel unnecessary/old datasheet queries.
+		private CancellationTokenSource CurrentTokenSource = new CancellationTokenSource();
+		private CancellationTokenSource PreviousTokenSource;
+
+		#endregion
 	}
 }

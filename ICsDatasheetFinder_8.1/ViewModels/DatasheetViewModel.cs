@@ -42,7 +42,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			set
 			{
 				parameter = value;
-				NotifyOfPropertyChange();
+				NotifyOfPropertyChange("Parameter");
 			}
 		}
 

@@ -11,6 +11,7 @@ using Windows.UI.Xaml.Data;
 
 namespace ICsDatasheetFinder_8._1.Common
 {
+	// TODO : refaire IncrementalLoadingBase de manière plus adaptée à mon usage ( et enlever tout les trucs inutiles )
 	// This class can used as a jumpstart for implementing ISupportIncrementalLoading. 
 	// Implementing the ISupportIncrementalLoading interfaces allows you to create a list that loads
 	//  more data automatically when the user scrolls to the end of of a GridView or ListView.

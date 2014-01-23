@@ -31,12 +31,12 @@
 							<RowDefinition/>
 						</Grid.RowDefinitions>
 						<TextBlock x:Uid="EnterAref_TextBlock" Style="{StaticResource SubheaderTextStyle}" VerticalAlignment="Top"/>
-						<TextBox Grid.Row="1" cal:Message.Attach="[Event TextChanged] = [QueryForDatasheets($source)]; [Event Loaded] = [QueryTextBox_Loaded($source)]" Margin="0,40,0,0" HorizontalAlignment="Left" MinWidth="71" Width="256" MaxLength="30"/>
+						<TextBox Grid.Row="1" cal:Message.Attach="[Event TextChanged] = [UserQueryChanged($source)]; [Event Loaded] = [QueryTextBox_Loaded($source)]" Margin="0,40,0,0" HorizontalAlignment="Left" MinWidth="71" Width="256" MaxLength="30"/>
 						<Image x:Name="logo" Grid.Row="2" Source="ms-appx:///Resources/Images/Logo.png" MaxWidth="521" MaxHeight="454" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LogoVisibility, ElementName=page}" Margin="0,80,0,0"/>
 					</Grid>
 				</DataTemplate>
 			</HubSection>
-
+			
 			<HubSection x:Name="DatasheetsHubSection" MaxWidth="1200" MaxHeight="2560" Visibility="{Binding IsAnyQuery, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalContentAlignment="Stretch">
 				<HubSection.Header>
 					<Grid>

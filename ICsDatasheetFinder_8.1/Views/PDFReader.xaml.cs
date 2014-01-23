@@ -17,11 +17,12 @@ using Windows.UI.Xaml.Navigation;
 
 namespace ICsDatasheetFinder_8._1.Views
 {
-    public sealed partial class PDFReader : UserControl
-    {
-        public PDFReader()
-        {
-            this.InitializeComponent();
-        }
-    }
+	// TODO : mettre le lecteur de PDF dans ce user control
+	public sealed partial class PDFReader : UserControl
+	{
+		public PDFReader()
+		{
+			this.InitializeComponent();
+		}
+	}
 }
