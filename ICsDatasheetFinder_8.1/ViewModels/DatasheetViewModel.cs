@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
 using Windows.Networking.BackgroundTransfer;
 using System.Net.Http;
+using System.Threading;
 
 namespace ICsDatasheetFinder_8._1.ViewModels
 {
@@ -59,7 +60,6 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				NotifyOfPropertyChange("PartReference");
 			}
 		}
-		
 
 		private async void LoadDatasheet()
 		{
@@ -84,6 +84,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 							if (pdfPage != null)
 							{
+								// TODO : add temporary images and datasheets in specific folders
 								StorageFile pngFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Guid.NewGuid().ToString() + ".png", CreationCollisionOption.ReplaceExisting);
 
 
@@ -133,6 +134,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			StorageFile DatasheetFile;
 			if (response.Content.Headers.ContentType.MediaType == "application/pdf")
 			{
+				// TODO : add temporary images and datasheets in specific folders
 				DatasheetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Guid.NewGuid().ToString() + ".pdf", CreationCollisionOption.ReplaceExisting);
 
 				using (IRandomAccessStream fs = await DatasheetFile.OpenAsync(FileAccessMode.ReadWrite))
@@ -154,10 +156,13 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 
 		private async void PageUnloaded()
 		{
-			foreach(var file in await ApplicationData.Current.TemporaryFolder.GetFilesAsync())
+			await _TempFolderDeletionLock.WaitAsync();
+			foreach (var file in await ApplicationData.Current.TemporaryFolder.GetFilesAsync())
 			{
 				await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
 			}
+
+			_TempFolderDeletionLock.Release();
 		}
 
 		private async Task SeeDatasheetOnBrowser()
@@ -202,7 +207,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				}
 				//else
 				//{
-					// TODO : Message d'erreur
+				// TODO : Message d'erreur
 				//}
 			}
 		}
@@ -250,5 +255,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		}
 
 		private StorageFile _pdfFile;
+
+		private static SemaphoreSlim _TempFolderDeletionLock = new SemaphoreSlim(1);
 	}
 }
