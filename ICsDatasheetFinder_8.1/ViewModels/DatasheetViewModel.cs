@@ -157,12 +157,18 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		private async void PageUnloaded()
 		{
 			await _TempFolderDeletionLock.WaitAsync();
-			foreach (var file in await ApplicationData.Current.TemporaryFolder.GetFilesAsync())
-			{
-				await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
-			}
 
-			_TempFolderDeletionLock.Release();
+			try
+			{
+				foreach (var file in await ApplicationData.Current.TemporaryFolder.GetFilesAsync())
+				{
+					await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
+				}
+			}
+			finally
+			{
+				_TempFolderDeletionLock.Release();
+			}
 		}
 
 		private async Task SeeDatasheetOnBrowser()
