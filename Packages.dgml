@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="ICsDatasheetFinder_8.1" Label="ICsDatasheetFinder_8.1" Category="Projet" />
+    <Node Id="Caliburn.Micro 1.5.2" Label="Caliburn.Micro 1.5.2" Category="Package" />
+    <Node Id="Callisto 1.2.9" Label="Callisto 1.2.9" Category="Package" />
+    <Node Id="sqlite-net 1.0.7" Label="sqlite-net 1.0.7" Category="Package" />
+    <Node Id="Windows.UI.Interactivity 1.1.0.0" Label="Windows.UI.Interactivity 1.1.0.0" Category="Package" />
+  </Nodes>
+  <Links>
+    <Link Source="Caliburn.Micro 1.5.2" Target="Windows.UI.Interactivity 1.1.0.0" Category="Dépendance de package" />
+    <Link Source="Caliburn.Micro 1.5.2" Target="Callisto 1.2.9" Category="Dépendance de package" />
+    <Link Source="ICsDatasheetFinder_8.1" Target="Caliburn.Micro 1.5.2" Category="Package installé" />
+    <Link Source="ICsDatasheetFinder_8.1" Target="sqlite-net 1.0.7" Category="Package installé" />
+  </Links>
+  <Categories>
+    <Category Id="Projet" />
+    <Category Id="Package" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Projet" ValueLabel="True">
+      <Condition Expression="HasCategory('Projet')" />
+      <Setter Property="Background" Value="Blue" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Dépendance de package" ValueLabel="True">
+      <Condition Expression="HasCategory('Dépendance de package')" />
+      <Setter Property="Background" Value="Yellow" />
+    </Style>
+  </Styles>
+</DirectedGraph>
