@@ -142,13 +142,23 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		/// </summary>
 		private void UpdateManufacturerSelection(SelectionChangedEventArgs e)
 		{
+			bool selectedManufacturersUpdated = false;
 			foreach (Manufacturer manu in e.AddedItems)
 				if (!selectedManufacturers.Contains(manu))
+				{
 					selectedManufacturers.Add(manu);
+					selectedManufacturersUpdated = true;
+				}
 
 			foreach (Manufacturer manu in e.RemovedItems)
 				if (selectedManufacturers.Contains(manu))
+				{
 					selectedManufacturers.Remove(manu);
+					selectedManufacturersUpdated = true;
+				}
+
+			if (selectedManufacturersUpdated)
+				NotifyOfPropertyChange<IList<Manufacturer>>(() => selectedManufacturers);
 		}
 
 		public void UserQueryChanged(object sender)
