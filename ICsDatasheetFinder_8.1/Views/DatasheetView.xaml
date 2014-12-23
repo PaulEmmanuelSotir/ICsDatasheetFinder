@@ -88,7 +88,7 @@
 								<Image Source="{Binding PageImage}" Stretch="Uniform"/>
 							</Grid>
 						</Viewbox>
-						
+
 						<TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Style="{StaticResource TitleTextBlockStyle}" Foreground="White">
 							<Run Text="Page "/>
 							<Run Text="{Binding PageNumber}"/>

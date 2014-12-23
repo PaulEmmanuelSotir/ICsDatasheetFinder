@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 namespace ICsDatasheetFinder_8._1.Common
 {
+	// TODO : il faut faire passer qqchose qui hérite de EventArgs en paramètre plutôt qu'un WindowState directement
 	public delegate void StateChangedEventHandler(object sender, WindowState state);
 
 	public class WindowHelper
 	{
-		private Page _page;
-
 		public WindowHelper(Page page)
 		{
 			_page = page;
@@ -21,17 +18,15 @@ namespace ICsDatasheetFinder_8._1.Common
 			_page.Unloaded += page_Unloaded;
 		}
 
-		public IEnumerable<WindowState> States { get; set; }
-
 		public event StateChangedEventHandler StateChanged;
 
-		private void page_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+		private void page_Loaded(object sender, RoutedEventArgs e)
 		{
 			Window.Current.SizeChanged += Window_SizeChanged;
 			DetermineState(Window.Current.Bounds.Width, Window.Current.Bounds.Height);
 		}
 
-		private void page_Unloaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+		private void page_Unloaded(object sender, RoutedEventArgs e)
 		{
 			Window.Current.SizeChanged -= Window_SizeChanged;
 		}
@@ -45,15 +40,17 @@ namespace ICsDatasheetFinder_8._1.Common
 		{
 			var state = States.First(x => x.MatchCriterium(width, height));
 			VisualStateManager.GoToState(_page, state.State, transitions);
-			if (state != CurrentState)
+			if (state != _currentState)
 			{
-				CurrentState = state;
-				if (StateChanged != null)
-					StateChanged.Invoke(this, state);
+				_currentState = state;
+				StateChanged?.Invoke(this, state);
 			}
 		}
 
-		private WindowState CurrentState;
+		public IEnumerable<WindowState> States { get; set; }
+
+		private WindowState _currentState;
+		private Page _page;
 	}
 
 	public class WindowState

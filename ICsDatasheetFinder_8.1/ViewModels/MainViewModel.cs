@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Caliburn.Micro;
+using ICsDatasheetFinder_8._1.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Windows.UI.Xaml.Controls;
 using Windows.System;
-using Caliburn.Micro;
-using ICsDatasheetFinder_8._1.Data;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace ICsDatasheetFinder_8._1.ViewModels
 {
@@ -18,13 +17,13 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			: base(navigationService)
 		{
 			Manufacturers = new BindableCollection<IGrouping<char, Manufacturer>>();
-			selectedManufacturers = new List<Manufacturer>();
-			datasheets = new HashSet<Part>();
+			_selectedManufacturers = new List<Manufacturer>();
+			_datasheets = new HashSet<Part>();
 
 			// Update found datasheets if query or selected manufacturers changed
 			this.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler((obj, Args) =>
 			{
-				if (Args.PropertyName == "ManufacturerSelectionEnabled" || Args.PropertyName == "selectedManufacturers" || Args.PropertyName == "Query")
+				if (Args.PropertyName == nameof(ManufacturerSelectionEnabled) || Args.PropertyName == nameof(_selectedManufacturers) || Args.PropertyName == nameof(Query))
 					QueryForDatasheets();
 			});
 		}
@@ -41,7 +40,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			{
 				Manufacturers.AddRange(DatasheetDataSource.GetManufacturers());
 				// Get ungrouped manufacters
-				ungroupedManufacters = (from manusGroupedByLetter in Manufacturers from manu in manusGroupedByLetter select manu).ToList<Manufacturer>();
+				_ungroupedManufacters = (from manusGroupedByLetter in Manufacturers from manu in manusGroupedByLetter select manu).ToList<Manufacturer>();
 			});
 
 			// Load manufacturers logos
@@ -76,11 +75,11 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		private async void QueryForDatasheets()
 		{
 			// Cancel old datasheet queries and create a new CancellationTokenSource
-			if (PreviousTokenSource != null)
-				PreviousTokenSource.Cancel(true);
+			if (_previousTokenSource != null)
+				_previousTokenSource.Cancel(true);
 			// TODO : wait for the canceled task (task cancelling is not instantaneous !)
-			CurrentTokenSource = new CancellationTokenSource();
-			PreviousTokenSource = CurrentTokenSource;
+			_currentTokenSource = new CancellationTokenSource();
+			_previousTokenSource = _currentTokenSource;
 
 			IsZeroManufacturerSelected = false;
 			IsEmptyResult = false;
@@ -91,40 +90,43 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			{
 				if (IsAnyQuery)
 				{
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					_currentTokenSource.Token.ThrowIfCancellationRequested();
 					IsProcesssing = true;
 
-					if (datasheets.Count != 0)
+					if (_datasheets.Count != 0)
 					{
-						datasheets.Clear();
+						_datasheets.Clear();
+						NotifyOfPropertyChange<HashSet<Part>>(() => Datasheets);
 						NotifyOfPropertyChange<int>(() => DatasheetsCount);
 					}
 
 					IList<Part> data = await Task.Factory.StartNew(() =>
 					{
 						if (ManufacturerSelectionEnabled)
-							return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, selectedManufacturers, FIRST_SEARCH_RANGE);
-						return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, FIRST_SEARCH_RANGE);
-					}, CurrentTokenSource.Token);
+							return DatasheetDataSource.SearchForDatasheet(Query, _currentTokenSource.Token, _selectedManufacturers, FIRST_SEARCH_RANGE);
+						return DatasheetDataSource.SearchForDatasheet(Query, _currentTokenSource.Token, FIRST_SEARCH_RANGE);
+					}, _currentTokenSource.Token);
 
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					_currentTokenSource.Token.ThrowIfCancellationRequested();
 
 					Datasheets.UnionWith(data);
-					NotifyOfPropertyChange<int>(() => DatasheetsCount);
-					// preparation de l'incremental loading et affichage de la première page.
-					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
+					NotifyOfPropertyChange(nameof(Datasheets));
+					NotifyOfPropertyChange(nameof(DatasheetsCount));
+					// Preparation de l'incremental loading et affichage de la première page.
+					ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), _ungroupedManufacters);
 					IsMoreResult = Datasheets.Count == FIRST_SEARCH_RANGE;
 
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					_currentTokenSource.Token.ThrowIfCancellationRequested();
 					await ViewDatasheets.LoadMoreItemsAsync(FIRST_SEARCH_RANGE);
-					CurrentTokenSource.Token.ThrowIfCancellationRequested();
+					_currentTokenSource.Token.ThrowIfCancellationRequested();
 
 					IsProcesssing = false;
 				}
 
-				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+				_currentTokenSource.Token.ThrowIfCancellationRequested();
+
 				if (Datasheets.Count == 0)
-					if (ManufacturerSelectionEnabled && selectedManufacturers.Count == 0)
+					if (ManufacturerSelectionEnabled && _selectedManufacturers.Count == 0)
 						IsZeroManufacturerSelected = true;
 					else
 						IsEmptyResult = true;
@@ -142,28 +144,30 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		/// </summary>
 		private void UpdateManufacturerSelection(SelectionChangedEventArgs e)
 		{
+			// Boolean used to call 'NotifyOfPropertyChange' once
 			bool selectedManufacturersUpdated = false;
+
 			foreach (Manufacturer manu in e.AddedItems)
-				if (!selectedManufacturers.Contains(manu))
+				if (!_selectedManufacturers.Contains(manu))
 				{
-					selectedManufacturers.Add(manu);
+					_selectedManufacturers.Add(manu);
 					selectedManufacturersUpdated = true;
 				}
 
 			foreach (Manufacturer manu in e.RemovedItems)
-				if (selectedManufacturers.Contains(manu))
+				if (_selectedManufacturers.Contains(manu))
 				{
-					selectedManufacturers.Remove(manu);
+					_selectedManufacturers.Remove(manu);
 					selectedManufacturersUpdated = true;
 				}
 
 			if (selectedManufacturersUpdated)
-				NotifyOfPropertyChange<IList<Manufacturer>>(() => selectedManufacturers);
+				NotifyOfPropertyChange(nameof(_selectedManufacturers));
 		}
 
 		public void UserQueryChanged(object sender)
 		{
-			// doesn't throws exceptions: if(sender == null) => (sender is TextBox) == false
+			// Doesn't throws exceptions: if(sender == null) => (sender is TextBox) == false
 			if (sender is TextBox)
 			{
 				string input = (sender as TextBox).Text;
@@ -174,38 +178,39 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				Query = input.Trim();
 			}
 		}
+
 		private async void FindMoreResults()
 		{
-			// prevent any double task
-			if (PreviousTokenSource != null)
-				PreviousTokenSource.Cancel(true);
+			// Prevent any double task
+			_previousTokenSource?.Cancel(true);
 			//TODO : wait the canceled task.
-			CurrentTokenSource = new CancellationTokenSource();
-			PreviousTokenSource = CurrentTokenSource;
+			_currentTokenSource = new CancellationTokenSource();
+			_previousTokenSource = _currentTokenSource;
 
 			try
 			{
-				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+				_currentTokenSource.Token.ThrowIfCancellationRequested();
 				IsProcesssing = true;
 
 				var data = await Task.Factory.StartNew(() =>
 				{
 					if (ManufacturerSelectionEnabled)
-						return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token, selectedManufacturers);
-					return DatasheetDataSource.SearchForDatasheet(Query, CurrentTokenSource.Token);
-				}, CurrentTokenSource.Token);
+						return DatasheetDataSource.SearchForDatasheet(Query, _currentTokenSource.Token, _selectedManufacturers);
+					return DatasheetDataSource.SearchForDatasheet(Query, _currentTokenSource.Token);
+				}, _currentTokenSource.Token);
 
-				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+				_currentTokenSource.Token.ThrowIfCancellationRequested();
 
-				datasheets.Clear();
+				_datasheets.Clear();
 				Datasheets.UnionWith(data);
-				NotifyOfPropertyChange<int>(() => DatasheetsCount);
-				ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), ungroupedManufacters);
+				NotifyOfPropertyChange(nameof(Datasheets));
+				NotifyOfPropertyChange(nameof(DatasheetsCount));
+				ViewDatasheets = new Common.IncrementalLoadingDatasheetList(Datasheets.ToList(), _ungroupedManufacters);
 				IsMoreResult = false;
 
-				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+				_currentTokenSource.Token.ThrowIfCancellationRequested();
 				await ViewDatasheets.LoadMoreItemsAsync(120);
-				CurrentTokenSource.Token.ThrowIfCancellationRequested();
+				_currentTokenSource.Token.ThrowIfCancellationRequested();
 
 				IsProcesssing = false;
 			}
@@ -227,18 +232,9 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			txtBox.Focus(FocusState.Programmatic);
 		}
 
-		#region Attributes
+		#region Properties
 
-		public BindableCollection<IGrouping<char, Manufacturer>> Manufacturers
-		{
-			get;
-			private set;
-		}
-		private List<Manufacturer> ungroupedManufacters
-		{
-			get;
-			set;
-		}
+		public BindableCollection<IGrouping<char, Manufacturer>> Manufacturers { get; private set; }
 
 		// TODO : tester le search panel à la fin
 		/// <summary>
@@ -249,83 +245,71 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		{
 			get
 			{
-				return parameter;
+				return _parameter;
 			}
 			set
 			{
-				parameter = value;
-				NotifyOfPropertyChange("Parameter");
+				_parameter = value;
+				NotifyOfPropertyChange();
 			}
 		}
-		private string parameter;
 
 		public string Query
 		{
 			get
 			{
-				return query;
+				return _query;
 			}
 			private set
 			{
-				if (value != query)
+				if (value != _query)
 				{
-					query = value;
-					// TODO : comprendre lequel des deux types de notifications est le meilleur :
-					NotifyOfPropertyChange("Query");
-					//NotifyOfPropertyChange<string>(() => Query);
-					NotifyOfPropertyChange<bool>(() => IsAnyQuery);
+					_query = value;
+
+					NotifyOfPropertyChange();
+					NotifyOfPropertyChange(nameof(IsAnyQuery));
 				}
 			}
 		}
-		private string query;
-		public bool IsAnyQuery
-		{
-			get
-			{
-				if (query != null)
-					return query.Length > 0;
-				return false;
-			}
-		}
+
+		public bool IsAnyQuery => (_query?.Length ?? 0) > 0;
 
 		public bool IsMoreResult
 		{
 			get
 			{
-				return isMoreResult;
+				return _isMoreResult;
 			}
 			set
 			{
-				isMoreResult = value;
-				NotifyOfPropertyChange<bool>(() => IsMoreResult);
+				_isMoreResult = value;
+				NotifyOfPropertyChange();
 			}
 		}
-		private bool isMoreResult = false;
+
 		public bool IsEmptyResult
 		{
 			get
 			{
-				return isEmptyResult && !isZeroManufacturerSelected;
+				return _isEmptyResult && !_isZeroManufacturerSelected;
 			}
 			set
 			{
-				isEmptyResult = value;
-				NotifyOfPropertyChange<bool>(() => IsEmptyResult);
+				_isEmptyResult = value;
+				NotifyOfPropertyChange();
 			}
 		}
-		private bool isEmptyResult = false;
 
-		private bool isZeroManufacturerSelected = false;
 		public bool IsZeroManufacturerSelected
 		{
 			get
 			{
-				return isZeroManufacturerSelected && !isEmptyResult;
+				return _isZeroManufacturerSelected && !_isEmptyResult;
 			}
 			set
 			{
-				isZeroManufacturerSelected = value;
-				NotifyOfPropertyChange<bool>(() => IsZeroManufacturerSelected);
+				_isZeroManufacturerSelected = value;
+				NotifyOfPropertyChange();
 			}
 		}
 
@@ -333,71 +317,80 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		{
 			get
 			{
-				return isProcessing;
+				return _isProcessing;
 			}
 			set
 			{
-				isProcessing = value;
-				NotifyOfPropertyChange<bool>(() => IsProcesssing);
+				_isProcessing = value;
+				NotifyOfPropertyChange();
 			}
 		}
-		private bool isProcessing = false;
 
-		public int DatasheetsCount
-		{
-			get
-			{
-				return datasheets.Count;
-			}
-		}
+		public int DatasheetsCount => _datasheets.Count;
+
 		public HashSet<Part> Datasheets
 		{
 			get
 			{
-				return datasheets;
+				return _datasheets;
 			}
 			private set
 			{
-				datasheets = value;
-				NotifyOfPropertyChange<HashSet<Part>>(() => Datasheets);
-				NotifyOfPropertyChange<int>(() => DatasheetsCount);
+				_datasheets = value;
+
+				NotifyOfPropertyChange();
+				NotifyOfPropertyChange(nameof(DatasheetsCount));
 			}
 		}
-		private HashSet<Part> datasheets;
+
 		public Common.IncrementalLoadingDatasheetList ViewDatasheets
 		{
 			get
 			{
-				return viewDatasheets;
+				return _viewDatasheets;
 			}
 			private set
 			{
-				viewDatasheets = value;
-				NotifyOfPropertyChange<Common.IncrementalLoadingDatasheetList>(() => ViewDatasheets);
+				_viewDatasheets = value;
+				NotifyOfPropertyChange();
 			}
 		}
-		private Common.IncrementalLoadingDatasheetList viewDatasheets;
+
 		public bool ManufacturerSelectionEnabled
 		{
 			get
 			{
-				return manufacturerSelectionEnabled;
+				return _manufacturerSelectionEnabled;
 			}
 			set
 			{
-				manufacturerSelectionEnabled = value;
-				NotifyOfPropertyChange<bool>(() => ManufacturerSelectionEnabled);
+				_manufacturerSelectionEnabled = value;
+				NotifyOfPropertyChange();
 			}
 		}
-		private bool manufacturerSelectionEnabled;
 
-		private IList<Manufacturer> selectedManufacturers;
+		#endregion
+
+		#region Members
 
 		private const int FIRST_SEARCH_RANGE = 120;
 
+		private string _parameter;
+		private string _query;
+		private bool _isMoreResult = false;
+		private bool _isEmptyResult = false;
+		private bool _isZeroManufacturerSelected = false;
+		private bool _isProcessing = false;
+		private HashSet<Part> _datasheets;
+		private Common.IncrementalLoadingDatasheetList _viewDatasheets;
+		private bool _manufacturerSelectionEnabled;
+		private List<Manufacturer> _selectedManufacturers;
+		private List<Manufacturer> _ungroupedManufacters;
+
+
 		// Cancellation Token used to cancel unnecessary/old datasheet queries.
-		private CancellationTokenSource CurrentTokenSource = new CancellationTokenSource();
-		private CancellationTokenSource PreviousTokenSource;
+		private CancellationTokenSource _currentTokenSource = new CancellationTokenSource();
+		private CancellationTokenSource _previousTokenSource;
 
 		#endregion
 	}

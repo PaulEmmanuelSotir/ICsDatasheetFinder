@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using ICsDatasheetFinder_8._1.Data;
-using ICsDatasheetFinder_8._1.Common;
-using Windows.Data.Pdf;
-using Windows.Storage;
-using Windows.System;
-using Windows.UI.Xaml.Media;
-using Windows.Storage.Pickers;
-using Windows.Storage.Provider;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.Storage.Streams;
-using Windows.Networking.BackgroundTransfer;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
+using Windows.Data.Pdf;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Provider;
+using Windows.Storage.Streams;
+using Windows.System;
 
 namespace ICsDatasheetFinder_8._1.ViewModels
 {
@@ -33,37 +26,9 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			});
 		}
 
-		private String datasheetURL;
-		public String DatasheetURL
-		{
-			get
-			{
-				return datasheetURL;
-			}
-			set
-			{
-				datasheetURL = value;
-				NotifyOfPropertyChange("DatasheetURL");
-			}
-		}
-
-		private String partReference;
-		public String PartReference
-		{
-			get
-			{
-				return partReference;
-			}
-			set
-			{
-				partReference = value;
-				NotifyOfPropertyChange("PartReference");
-			}
-		}
-
 		private async void LoadDatasheet()
 		{
-			PdfDocument _pdfDocument;
+			PdfDocument pdfDocument;
 			try
 			{
 				_pdfFile = await DownloadDatasheet();
@@ -72,19 +37,19 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 				{
 					IsDownloadingDatasheet = false;
 					IsLoadingDatasheet = true;
-					_pdfDocument = await PdfDocument.LoadFromFileAsync(_pdfFile);
+					pdfDocument = await PdfDocument.LoadFromFileAsync(_pdfFile);
 
-					datasheetPages = new BindableCollection<DatasheetPage>();
+					_datasheetPages = new BindableCollection<DatasheetPage>();
 
-					if (_pdfDocument != null)
+					if (pdfDocument != null)
 					{
-						for (uint i = 0; i < _pdfDocument.PageCount; i++)
+						for (uint i = 0; i < pdfDocument.PageCount; i++)
 						{
-							var pdfPage = await Task.Run(() => _pdfDocument.GetPage(i));
+							var pdfPage = await Task.Run(() => pdfDocument.GetPage(i));
 
 							if (pdfPage != null)
 							{
-								// TODO : add temporary images and datasheets in specific folders
+								// TODO : add images in a specific folder in temp
 								StorageFile pngFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Guid.NewGuid().ToString() + ".png", CreationCollisionOption.ReplaceExisting);
 
 
@@ -102,7 +67,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 									DatasheetPage page = new DatasheetPage(pdfPage.Index + 1, pdfPage.Dimensions.ArtBox, pngFile.Path);
 									pdfPage.Dispose();
 
-									datasheetPages.Add(page);
+									_datasheetPages.Add(page);
 									NotifyOfPropertyChange<BindableCollection<DatasheetPage>>(() => DatasheetPages);
 								}
 							}
@@ -130,15 +95,18 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			// Lien de la déclaration de confidentialité : "http://ma.ms.giz.fr/?name=Datasheet+Finder"
 			HttpClient client = new HttpClient();
 			client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36");
-			HttpResponseMessage response = await client.GetAsync(DatasheetURL);
-			StorageFile DatasheetFile;
-			if (response.Content.Headers.ContentType.MediaType == "application/pdf")
-			{
-				// TODO : add temporary images and datasheets in specific folders
-				DatasheetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Guid.NewGuid().ToString() + ".pdf", CreationCollisionOption.ReplaceExisting);
 
-				using (IRandomAccessStream fs = await DatasheetFile.OpenAsync(FileAccessMode.ReadWrite))
+			StorageFile datasheetFile = null;
+
+			using (client)
+			using (var response = await client.GetAsync(DatasheetURL))
+			{
+				if (response.Content.Headers.ContentType.MediaType == "application/pdf")
 				{
+					// TODO : add temporary images and datasheets in specific folders
+					datasheetFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync(Guid.NewGuid().ToString() + ".pdf", CreationCollisionOption.ReplaceExisting);
+
+					using (IRandomAccessStream fs = await datasheetFile.OpenAsync(FileAccessMode.ReadWrite))
 					using (DataWriter writer = new DataWriter(fs.GetOutputStreamAt(0)))
 					{
 						writer.WriteBytes(await response.Content.ReadAsByteArrayAsync());
@@ -146,12 +114,9 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 						await fs.FlushAsync();
 					}
 				}
-				response.Dispose();
-				client.Dispose();
-
-				return DatasheetFile;
 			}
-			return null;
+
+			return datasheetFile;
 		}
 
 		private async void PageUnloaded()
@@ -161,9 +126,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			try
 			{
 				foreach (var file in await ApplicationData.Current.TemporaryFolder.GetFilesAsync())
-				{
 					await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
-				}
 			}
 			finally
 			{
@@ -190,7 +153,7 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 		{
 			if (_pdfFile != null)
 			{
-				FileSavePicker savePicker = new FileSavePicker();
+				var savePicker = new FileSavePicker();
 				savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 				savePicker.FileTypeChoices.Add("PDF document", new List<string>() { ".pdf" });
 				savePicker.SuggestedFileName = _pdfFile.DisplayName;
@@ -218,50 +181,86 @@ namespace ICsDatasheetFinder_8._1.ViewModels
 			}
 		}
 
-		private bool isDownloadingDatasheet = true;
+		#region Properties
+
+		public String DatasheetURL
+		{
+			get
+			{
+				return _datasheetURL;
+			}
+			set
+			{
+				_datasheetURL = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
+		public String PartReference
+		{
+			get
+			{
+				return _partReference;
+			}
+			set
+			{
+				_partReference = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
 		public bool IsDownloadingDatasheet
 		{
 			get
 			{
-				return isDownloadingDatasheet;
+				return _isDownloadingDatasheet;
 			}
 			private set
 			{
-				isDownloadingDatasheet = value;
-				NotifyOfPropertyChange<bool>(() => IsDownloadingDatasheet);
+				_isDownloadingDatasheet = value;
+				NotifyOfPropertyChange();
 			}
 		}
 
-		private bool isLoadingDatasheet = false;
 		public bool IsLoadingDatasheet
 		{
 			get
 			{
-				return isLoadingDatasheet;
+				return _isLoadingDatasheet;
 			}
 			private set
 			{
-				isLoadingDatasheet = value;
-				NotifyOfPropertyChange<bool>(() => IsLoadingDatasheet);
+				_isLoadingDatasheet = value;
+				NotifyOfPropertyChange();
 			}
 		}
 
-		private BindableCollection<DatasheetPage> datasheetPages;
 		public BindableCollection<DatasheetPage> DatasheetPages
 		{
 			get
 			{
-				return datasheetPages;
+				return _datasheetPages;
 			}
 			private set
 			{
-				datasheetPages = value;
-				NotifyOfPropertyChange<BindableCollection<DatasheetPage>>(() => DatasheetPages);
+				_datasheetPages = value;
+				NotifyOfPropertyChange();
 			}
 		}
 
+		#endregion
+
+		#region Members
+
+		private String _datasheetURL;
+		private String _partReference;
+		private bool _isLoadingDatasheet = false;
+		private bool _isDownloadingDatasheet = true;
 		private StorageFile _pdfFile;
+		private BindableCollection<DatasheetPage> _datasheetPages;
 
 		private static SemaphoreSlim _TempFolderDeletionLock = new SemaphoreSlim(1);
+
+		#endregion
 	}
 }

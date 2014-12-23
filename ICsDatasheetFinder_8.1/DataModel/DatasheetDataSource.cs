@@ -1,115 +1,103 @@
-﻿using System;
-using System.IO;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using SQLite;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.Storage;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace ICsDatasheetFinder_8._1.Data
 {
-    public sealed class DatasheetDataSource
-    {
-        private static DatasheetDataSource _datasheetDataSource = new DatasheetDataSource();
+	public sealed class DatasheetDataSource
+	{
+		public static async Task LoadManufacturersImagesAsync()
+		{
+			if (_datasheetDataSource._allManufacturers.Count == 0)
+			{
+				await Task.Factory.StartNew(() =>
+				{
+					GetManufacturers();
+				});
+			}
 
-        public static async Task LoadManufacturersImagesAsync()
-        {
-            if (_datasheetDataSource._allManufacturers.Count == 0)
-            {
-                await Task.Factory.StartNew(() =>
-                {
-                    GetManufacturers();
-                });
-            }
+			var dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+			await Task.Run(() =>
+			{
+				foreach (IGrouping<char, Manufacturer> g in _datasheetDataSource._allManufacturers)
+				{
+					foreach (Manufacturer manu in g)
+					{
+						// Load asyncronously bitmaps
+						// TODO : store task, check exceptions...
+						dispatcher.RunAsync(CoreDispatcherPriority.Low, new DispatchedHandler(() =>
+						{
+							manu.Logo = new BitmapImage();
 
-            var dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            await Task.Run(() =>
-            {
-                foreach (IGrouping<char, Manufacturer> g in _datasheetDataSource._allManufacturers)
-                {
-                    foreach (Manufacturer manu in g)
-                    {
-                        // Load asyncronously bitmaps
-                        // TODO : store task, check exceptions...
-                        dispatcher.RunAsync(CoreDispatcherPriority.Low, new DispatchedHandler(() =>
-                        {
-                            manu.Logo = new BitmapImage();
+							manu.Logo.ImageFailed += new Windows.UI.Xaml.ExceptionRoutedEventHandler((sender, args) =>
+								{
+									// If manufacturer's logo isn't available, we load a default logo
+									manu.Logo = new BitmapImage(new Uri("ms-appx:///Data/ManufacturersImages/default.jpg"));
+								});
+							// Load manufacturer's logo otherwise (we use absolute path, instead of 'ms-appx:///' because we dont want LogoFileName to be parsed due to 'Uri.EscapeDataString(name)' function)
+							manu.Logo.UriSource = new Uri(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, @"Data\ManufacturersImages\", manu.LogoFileName));
+						}));
+					}
+				}
+			});
+		}
 
-                            manu.Logo.ImageFailed += new Windows.UI.Xaml.ExceptionRoutedEventHandler((sender, args) =>
-                                {
-                                    // If manufacturer's logo isn't available, we load a default logo
-                                    manu.Logo = new BitmapImage(new Uri("ms-appx:///Data/ManufacturersImages/default.jpg"));
-                                });
-                            // Load manufacturer's logo otherwise (we use absolute path, instead of 'ms-appx:///' because we dont want LogoFileName to be parsed due to 'Uri.EscapeDataString(name)' function)
-                            string path = Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, @"Data\ManufacturersImages\", manu.LogoFileName);
-                            manu.Logo.UriSource = new Uri(path);
-                        }));
-                    }
-                }
-            });
-        }
+		public static List<IGrouping<char, Manufacturer>> GetManufacturers()
+		{
+			if (_datasheetDataSource._allManufacturers.Count == 0)
+			{
+				using (var connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.ReadOnly))
+				{
+					_datasheetDataSource._allManufacturers = (from manu in connection.Table<Manufacturer>().ToList()
+															  orderby manu.name
+															  group manu by manu.name.ToUpper()[0] into g
+															  select g).ToList();
+				}
+			}
+			return _datasheetDataSource._allManufacturers;
+		}
 
-        public static List<IGrouping<char, Manufacturer>> GetManufacturers()
-        {
-            if (_datasheetDataSource._allManufacturers.Count == 0)
-            {
-                SQLiteConnection connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.ReadOnly);
-                _datasheetDataSource._allManufacturers = (from manu in connection.Table<Manufacturer>().ToList()
-                                                          orderby manu.name
-                                                          group manu by manu.name.ToUpper()[0] into g
-                                                          select g).ToList();
-                connection.Close();
-            }
-            return _datasheetDataSource._allManufacturers;
-        }
+		public static IList<Part> SearchForDatasheet(string queryRef, CancellationToken CancelToken, uint? MaxRsltCount = null)
+		{
+			return SearchForDatasheet(queryRef, CancelToken, null, MaxRsltCount);
+		}
 
-        private List<IGrouping<char, Manufacturer>> _allManufacturers = new List<IGrouping<char, Manufacturer>>();
+		public static IList<Part> SearchForDatasheet(string queryRef, CancellationToken CancelToken, IList<Manufacturer> manufacturers, uint? MaxRsltCount = null)
+		{
+			if (queryRef != null)
+			{
+				queryRef = queryRef.Replace("\'", string.Empty);
 
-        public static IList<Part> SearchForDatasheet(string queryRef, CancellationToken CancelToken, int MaxRsltCount = -1)
-        {
-            return SearchForDatasheet(queryRef, CancelToken, null, MaxRsltCount);
-        }
+				if (queryRef != string.Empty)
+				{
+					// If there is a non null empty manufacturers list, then we return an empty result
+					if (manufacturers?.Count == 0)
+						return new List<Part>();
 
-        public static IList<Part> SearchForDatasheet(string queryRef, CancellationToken CancelToken, IList<Manufacturer> manufacturers, int MaxRsltCount = -1)
-        {
-            if (queryRef != string.Empty && queryRef != null)
-            {
-                string query = string.Empty;
-                if(queryRef.Contains('\''))
-                    queryRef = queryRef.Replace("\'", "");
-                SQLiteConnection connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly);
-                query = MaxRsltCount >= 0 ? "select * from Part where reference LIKE '%{0}%' {1} LIMIT {2}" : "select * from Part where reference LIKE '%{0}%' {1}";
-                
-                try
-                {
-                    CancelToken.ThrowIfCancellationRequested();
-                    
-                    if (manufacturers != null)
-                    {
-                        if (manufacturers.Count == 0)
-                            return new List<Part>();
-                        String Ids = "AND ManufacturerId IN ( '" + String.Join("', '", manufacturers.Select((Manu) => Manu.Id)) + "' )";
-                        query = string.Format(query, queryRef, Ids, MaxRsltCount);
-                    }
-                    else
-                        query = string.Format(query, queryRef, "", MaxRsltCount);
+					var manusQuery = manufacturers != null ? "AND ManufacturerId IN ( '" + String.Join("', '", manufacturers.Select((Manu) => Manu.Id)) + "' )" : string.Empty;
+					var query = MaxRsltCount != null ? "select * from Part where reference LIKE '%\{queryRef}%' \{manusQuery} LIMIT \{MaxRsltCount}" : "select * from Part where reference LIKE '%\{queryRef}%' \{manusQuery}";
 
-                    CancelToken.ThrowIfCancellationRequested();
-                    var rslt = connection.Query<Part>(string.Format(query, queryRef, MaxRsltCount));
-                    CancelToken.ThrowIfCancellationRequested();
+					using (var connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly))
+					{
+						CancelToken.ThrowIfCancellationRequested();
+						var rslt = connection.Query<Part>(query);
+						CancelToken.ThrowIfCancellationRequested();
 
-                    return rslt;
-                }
-                finally
-                {
-                    connection.Close();
-                }
-            }
-            return null;
-        }
-    }
+						return rslt;
+					}
+				}
+			}
+			return null;
+		}
+
+		private static DatasheetDataSource _datasheetDataSource = new DatasheetDataSource();
+
+		private List<IGrouping<char, Manufacturer>> _allManufacturers = new List<IGrouping<char, Manufacturer>>();
+	}
 }

@@ -6,9 +6,10 @@
 	xmlns:calistoEffect="using:Callisto.Effects"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:Converters="using:ICsDatasheetFinder_8._1.Converters" x:Name="page"
+	xmlns:Converters="using:ICsDatasheetFinder_8._1.Converters"
+	x:Name="page"
 	x:Class="ICsDatasheetFinder_8._1.Views.MainView"
-	mc:Ignorable="d">
+	mc:Ignorable="d" Loaded="page_Loaded">
 	<Page.Resources>
 		<Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 		<Converters:BooleanNegationConverter x:Key="BooleanNegationConverter"/>
@@ -36,18 +37,18 @@
 					</Grid>
 				</DataTemplate>
 			</HubSection>
-			
+
 			<HubSection x:Name="DatasheetsHubSection" MaxWidth="1200" MaxHeight="2560" Visibility="{Binding IsAnyQuery, Converter={StaticResource BooleanToVisibilityConverter}}" VerticalContentAlignment="Stretch">
 				<HubSection.Header>
 					<Grid>
-						<!-- TODO : génerer la phrase dans le code behind et enlever tout les booléens débiles -->
+						<!-- TODO : génerer les phrases dans le code behind et enlever tout les booléens débiles -->
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<TextBlock Style="{StaticResource SubheaderTextStyle}" Visibility="{Binding IsMoreResult, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=True}" Margin="0,0,10,0">
-							<Run Text="{Binding DatasheetsCount}" FontWeight="Bold"/>
-						</TextBlock>
+						<TextBlock x:Name="NumberOfResults" 
+								   Style="{StaticResource SubheaderTextStyle}"
+								   FontWeight="Bold" Margin="0,0,10,0"/>
 						<TextBlock x:Name="ResultHubHeader" Grid.Column="1" Style="{StaticResource SubheaderTextStyle}">
 							<Run x:Uid="ResultHubHeader" Text="datasheets found for "/>
 							<Run Text="{Binding Query}"/>
@@ -113,7 +114,7 @@
 						<!--Manufacturers semantic zoom-->
 						<SemanticZoom Grid.Row="1" Margin="0" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Loaded="ManufacturersSemanticZoom_Loaded" IsEnabled="{Binding IsOn, ElementName=EnableManufacturerSelection}" >
 							<SemanticZoom.ZoomedOutView>
-								<GridView >
+								<GridView>
 									<GridView.ItemTemplate>
 										<DataTemplate>
 											<TextBlock Text="{Binding Group.Key}" FontFamily="Segoe UI Light" Foreground="Black" FontSize="36"/>
@@ -192,8 +193,9 @@
 					</DataTemplate>
 				</HubSection.HeaderTemplate>
 				<DataTemplate>
-					<Image Source="ms-appx:///Resources/Images/ElecDB_Featuring.png" CacheMode="BitmapCache" 
-						   calistoEffect:Tilt.IsTiltEnabled="True" HorizontalAlignment="Left" VerticalAlignment="Top"
+					<Image Source="ms-appx:///Resources/Images/ElecDB_Featuring.png" CacheMode="BitmapCache"
+						   calistoEffect:Tilt.IsTiltEnabled="True"
+						   HorizontalAlignment="Left" VerticalAlignment="Top"
 						   cal:Message.Attach="[Event Tapped] = [SeeElecDatabase()]" Stretch="None"/>
 				</DataTemplate>
 			</HubSection>

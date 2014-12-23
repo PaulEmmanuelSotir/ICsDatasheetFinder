@@ -1,22 +1,18 @@
 ﻿using Caliburn.Micro;
-using ICsDatasheetFinder_8._1.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Search;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Compression;
 using Windows.Storage.Streams;
+using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Windows.UI.ApplicationSettings;
-
+using ICsDatasheetFinder_8._1.ViewModels;
 using ICsDatasheetFinder_8._1.Views;
-
-// Pour plus d'informations sur le modèle Application vide, consultez la page http://go.microsoft.com/fwlink/?LinkId=234227
 
 namespace ICsDatasheetFinder_8._1
 {
@@ -33,14 +29,14 @@ namespace ICsDatasheetFinder_8._1
 
 		protected override void Configure()
 		{
-			container = new WinRTContainer();
-			container.RegisterWinRTServices();
+			_container = new WinRTContainer();
+			_container.RegisterWinRTServices();
 
-			container.PerRequest<MainViewModel>();
-			container.PerRequest<DatasheetViewModel>();
+			_container.PerRequest<MainViewModel>();
+			_container.PerRequest<DatasheetViewModel>();
 
 			SettingsPane.GetForCurrentView().CommandsRequested += SettingCommandsRequested;
-		}   
+		}
 
 		protected override async void OnLaunched(LaunchActivatedEventArgs e)
 		{
@@ -53,11 +49,11 @@ namespace ICsDatasheetFinder_8._1
 
 			// Show release note or decompress database if app is newly updated or has been launched for the first time.
 			var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-			string CurrentVersion = string.Format("{0}.{1}.{2}.{3}", Package.Current.Id.Version.Major, Package.Current.Id.Version.Minor, Package.Current.Id.Version.Build, Package.Current.Id.Version.Revision);
+			string CurrentVersion = "\{Package.Current.Id.Version.Major}.\{Package.Current.Id.Version.Minor}.\{Package.Current.Id.Version.Build}.\{Package.Current.Id.Version.Revision}";
 			object firstLaunchFlag = localSettings.Values["FirstLaunch"];
 			if (firstLaunchFlag is string)
 			{
-				if (((string)firstLaunchFlag) != CurrentVersion)
+				if ((string)firstLaunchFlag != CurrentVersion)
 				{
 					localSettings.Values["FirstLaunch"] = CurrentVersion;
 
@@ -94,7 +90,8 @@ namespace ICsDatasheetFinder_8._1
 		private void SettingCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
 		{
 			var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-			string PrivacyPolicy = loader.GetString("PrivacyPolicy");
+			var PrivacyPolicy = loader.GetString("PrivacyPolicy");
+
 			args.Request.ApplicationCommands.Add(new SettingsCommand(PrivacyPolicy, PrivacyPolicy, async Command =>
 			{
 				await Windows.System.Launcher.LaunchUriAsync(new Uri(loader.GetString("PrivacyPolicyURL")));
@@ -103,11 +100,13 @@ namespace ICsDatasheetFinder_8._1
 
 		protected override void OnSearchActivated(SearchActivatedEventArgs args)
 		{
+			//TODO: s'assurer que la base de donnée est décompressée ici?
 			DisplayRootView<MainView>(args.QueryText);
 		}
 
 		private void OnQuerySubmitted(object sender, SearchPaneQuerySubmittedEventArgs args)
 		{
+			//TODO: s'assurer que la base de donnée est décompressée ici?
 			DisplayRootView<MainView>(args.QueryText);
 		}
 
@@ -123,30 +122,30 @@ namespace ICsDatasheetFinder_8._1
 
 		protected override object GetInstance(Type service, string key)
 		{
-			return container.GetInstance(service, key);
+			return _container.GetInstance(service, key);
 		}
 
 		protected override IEnumerable<object> GetAllInstances(Type service)
 		{
-			return container.GetAllInstances(service);
+			return _container.GetAllInstances(service);
 		}
 
 		protected override void BuildUp(object instance)
 		{
-			container.BuildUp(instance);
+			_container.BuildUp(instance);
 		}
 
 		protected override void PrepareViewFirst(Frame rootFrame)
 		{
-			container.RegisterNavigationService(rootFrame);
+			_container.RegisterNavigationService(rootFrame);
 		}
 
 		private async Task DecompressDatabase(bool IsFirstLaunch)
 		{
 			// Decompress and copy database to Application Data Local Folder.
-			IAsyncOperation<StorageFile> compressedDBOp = Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(string.Format("Data\\{0}.compressed", DATABASE_FILE_NAME));
+			var compressedDBAsyncOp = Package.Current.InstalledLocation.GetFileAsync("Data\\\{DATABASE_FILE_NAME}.compressed");
 			var decompressedDB = await ApplicationData.Current.LocalFolder.CreateFileAsync(DATABASE_FILE_NAME, IsFirstLaunch ? CreationCollisionOption.FailIfExists : CreationCollisionOption.ReplaceExisting);
-			var compressedDB = await compressedDBOp;
+			var compressedDB = await compressedDBAsyncOp;
 
 			using (var compressedInput = await compressedDB.OpenSequentialReadAsync())
 			using (var decompressor = new Decompressor(compressedInput))
@@ -155,9 +154,9 @@ namespace ICsDatasheetFinder_8._1
 				await RandomAccessStream.CopyAsync(decompressor, decompressedOutput);
 			}
 		}
-		
-		// add our IOC container for registering services etc
-		private WinRTContainer container;
+
+		// Add our IOC container for registering services etc
+		private WinRTContainer _container;
 
 		public const string DATABASE_FILE_NAME = "datasheets.sqlite";
 	}

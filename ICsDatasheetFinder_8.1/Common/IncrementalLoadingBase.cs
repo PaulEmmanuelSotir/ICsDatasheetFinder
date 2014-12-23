@@ -2,9 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
@@ -195,12 +193,57 @@ namespace ICsDatasheetFinder_8._1.Common
 		protected List<object> _storage = new List<object>();
 		protected bool _busy = false;
 		private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+		private bool disposed = false;
 
 		#endregion
 
-		void IDisposable.Dispose()
+		#region IDisposable
+
+		///<remarks>Do not make this method virtual. A derived class should not be able to override this method.</remarks> 
+		public void Dispose()
 		{
-			_semaphoreSlim.Dispose();
+			Dispose(true);
+			// This object will be cleaned up by the Dispose method.
+			// Therefore, you should call GC.SupressFinalize to
+			// take this object off the finalization queue
+			// and prevent finalization code for this object
+			// from executing a second time.
+			GC.SuppressFinalize(this);
 		}
+
+		///<param name="disposing"> If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and unmanaged resources can be disposed. 
+		/// If disposing equals false, the method has been called by the runtime from inside the finalizer and you should not reference
+		/// other objects. Only unmanaged resources can be disposed.</param>
+		/// <see cref="http://joeduffyblog.com/2005/04/08/dg-update-dispose-finalization-and-resource-management/"/>
+		private void Dispose(bool disposing)
+		{
+			if (!this.disposed)
+			{
+				// If disposing equals true, dispose all managed
+				// and unmanaged resources.
+				if (disposing)
+				{
+					// MANAGED RESSOURCES
+					_semaphoreSlim.Dispose();
+				}
+
+				// UNMANAGED RESSOURCES
+				//...
+
+				disposed = true;
+			}
+		}
+
+		///<<summary> This destructor will run only if the Dispose method does not get called.</summary>
+		///<remarks>Do not provide destructors in types derived from this class.</remarks>
+		~IncrementalLoadingBase()
+		{
+			// Do not re-create Dispose clean-up code here.
+			// Calling Dispose(false) is optimal in terms of
+			// readability and maintainability.
+			Dispose(false);
+		}
+
+		#endregion
 	}
 }

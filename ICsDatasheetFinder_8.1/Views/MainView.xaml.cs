@@ -1,22 +1,9 @@
-﻿using System;
+﻿using ICsDatasheetFinder_8._1.Common;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using System.ComponentModel;
-
-using ICsDatasheetFinder_8._1;
-using ICsDatasheetFinder_8._1.Common;
-// Pour en savoir plus sur le modèle d'élément Page vierge, consultez la page http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace ICsDatasheetFinder_8._1.Views
 {
@@ -41,12 +28,12 @@ namespace ICsDatasheetFinder_8._1.Views
 
 			_windowHelper.StateChanged += new StateChangedEventHandler((sender, state) =>
 			{
-				if(state.State == "Vertical")
+				if (state.State == "Vertical")
 				{
 					HubView.Orientation = Orientation.Vertical;
 					LogoVisibility = Visibility.Collapsed;
 				}
-				else if(state.State == "Horizontal")
+				else if (state.State == "Horizontal")
 				{
 					HubView.Orientation = Orientation.Horizontal;
 					LogoVisibility = Visibility.Visible;
@@ -54,21 +41,16 @@ namespace ICsDatasheetFinder_8._1.Views
 			});
 		}
 
-		private Visibility logoVisibility = Visibility.Visible;
 		public Visibility LogoVisibility
 		{
 			get
 			{
-				return logoVisibility;
+				return _logoVisibility;
 			}
 			set
 			{
-				logoVisibility = value;
-				var eventHandler = this.PropertyChanged;
-				if (eventHandler != null)
-				{
-					eventHandler(this, new PropertyChangedEventArgs("LogoVisibility"));
-				}
+				_logoVisibility = value;
+				OnPropertyChanged();
 			}
 		}
 
@@ -77,7 +59,42 @@ namespace ICsDatasheetFinder_8._1.Views
 			// ZoomedOutView itemsource must be set in the code-behind to make semanticZoom navigation working
 			((sender as SemanticZoom).ZoomedOutView as ListViewBase).ItemsSource = this.ManufacturerSource.View.CollectionGroups;
 		}
-		
+
+		private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+		{
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+
+		private void page_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (DataContext is ViewModels.MainViewModel)
+			{
+				var VM = DataContext as ViewModels.MainViewModel;
+				VM.PropertyChanged += new PropertyChangedEventHandler((sndr, args) =>
+				{
+					if (args.PropertyName == nameof(ViewModels.MainViewModel.Datasheets))
+					{
+						//if (!(VM.Datasheets.Count == 0 && VM.IsProcesssing))
+						if (VM.Datasheets.Count > 0 && !VM.IsProcesssing)
+						{
+							NumberOfResults.Text = VM.Datasheets.Count.ToString();
+							NumberOfResults.Visibility = Windows.UI.Xaml.Visibility.Visible;
+						}
+						else
+							NumberOfResults.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+					}
+					if (args.PropertyName == nameof(ViewModels.MainViewModel.IsMoreResult))
+					{
+						if (VM.IsMoreResult)
+						{
+							NumberOfResults.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+						}
+					}
+				});
+			}
+		}
+
+		private Visibility _logoVisibility = Visibility.Visible;
 		private WindowHelper _windowHelper;
 	}
 }
