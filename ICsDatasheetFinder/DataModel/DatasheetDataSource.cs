@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace ICsDatasheetFinder_8._1.Data
+namespace ICsDatasheetFinder.Data
 {
 	public sealed class DatasheetDataSource
 	{

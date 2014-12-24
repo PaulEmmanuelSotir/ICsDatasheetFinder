@@ -11,10 +11,10 @@ using Windows.Storage.Streams;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using ICsDatasheetFinder_8._1.ViewModels;
-using ICsDatasheetFinder_8._1.Views;
+using ICsDatasheetFinder.ViewModels;
+using ICsDatasheetFinder.Views;
 
-namespace ICsDatasheetFinder_8._1
+namespace ICsDatasheetFinder
 {
 	/// <summary>
 	/// Fournit un comportement spécifique à l'application afin de compléter la classe Application par défaut.

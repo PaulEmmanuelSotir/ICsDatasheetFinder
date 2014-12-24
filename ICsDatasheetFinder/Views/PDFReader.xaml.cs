@@ -1,6 +1,6 @@
 ﻿using Windows.UI.Xaml.Controls;
 
-namespace ICsDatasheetFinder_8._1.Views
+namespace ICsDatasheetFinder.Views
 {
 	// TODO : mettre le lecteur de PDF dans ce user control
 	public sealed partial class PDFReader : UserControl

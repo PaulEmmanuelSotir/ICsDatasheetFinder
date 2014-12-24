@@ -1,14 +1,14 @@
 ﻿<Page
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:ICsDatasheetFinder_8._1.Views"
+	xmlns:local="using:ICsDatasheetFinder.Views"
 	xmlns:cal="using:Caliburn.Micro"
 	xmlns:calistoEffect="using:Callisto.Effects"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:Converters="using:ICsDatasheetFinder_8._1.Converters"
+	xmlns:Converters="using:ICsDatasheetFinder.Converters"
 	x:Name="page"
-	x:Class="ICsDatasheetFinder_8._1.Views.MainView"
+	x:Class="ICsDatasheetFinder.Views.MainView"
 	mc:Ignorable="d" Loaded="page_Loaded">
 	<Page.Resources>
 		<Converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

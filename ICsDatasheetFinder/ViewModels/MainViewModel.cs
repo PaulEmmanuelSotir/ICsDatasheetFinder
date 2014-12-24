@@ -1,5 +1,5 @@
 ﻿using Caliburn.Micro;
-using ICsDatasheetFinder_8._1.Data;
+using ICsDatasheetFinder.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace ICsDatasheetFinder_8._1.ViewModels
+namespace ICsDatasheetFinder.ViewModels
 {
 	public sealed class MainViewModel : ViewModelBase
 	{

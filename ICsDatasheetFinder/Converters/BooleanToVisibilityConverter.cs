@@ -2,7 +2,7 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace ICsDatasheetFinder_8._1.Converters
+namespace ICsDatasheetFinder.Converters
 {
 	public class BooleanToVisibilityConverter : IValueConverter
 	{

@@ -1,8 +1,8 @@
-﻿using ICsDatasheetFinder_8._1.Common;
+﻿using ICsDatasheetFinder.Common;
 using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 
-namespace ICsDatasheetFinder_8._1.Views
+namespace ICsDatasheetFinder.Views
 {
 	/// <summary>
 	/// Une page vide peut être utilisée seule ou constituer une page de destination au sein d'un frame.

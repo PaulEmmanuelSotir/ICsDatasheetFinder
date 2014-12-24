@@ -14,7 +14,7 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ICsDatasheetFinder_8._1.App">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ICsDatasheetFinder.App">
       <m2:VisualElements DisplayName="ICs Datasheet Finder" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="Integrated circuits datasheet finder application." ForegroundText="dark" BackgroundColor="#E6E6E6" ToastCapable="false">
         <m2:DefaultTile ShortName="Datasheet Finder" Wide310x150Logo="Assets\Wide310x150Logo.png" Square70x70Logo="Assets\Square70x70Logo.png" DefaultSize="wide310x150Logo">
         </m2:DefaultTile>

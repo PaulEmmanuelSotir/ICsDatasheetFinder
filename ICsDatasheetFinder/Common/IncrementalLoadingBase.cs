@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Data;
 
-namespace ICsDatasheetFinder_8._1.Common
+namespace ICsDatasheetFinder.Common
 {
 	// TODO : refaire IncrementalLoadingBase de manière plus adaptée à mon usage ( et enlever tout les trucs inutiles )
 	// This class can used as a jumpstart for implementing ISupportIncrementalLoading. 

@@ -4,7 +4,7 @@ using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace ICsDatasheetFinder_8._1.Common
+namespace ICsDatasheetFinder.Common
 {
 	// TODO : il faut faire passer qqchose qui hérite de EventArgs en paramètre plutôt qu'un WindowState directement
 	public delegate void StateChangedEventHandler(object sender, WindowState state);

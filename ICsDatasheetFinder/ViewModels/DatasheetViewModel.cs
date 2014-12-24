@@ -1,5 +1,5 @@
 ﻿using Caliburn.Micro;
-using ICsDatasheetFinder_8._1.Data;
+using ICsDatasheetFinder.Data;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -12,7 +12,7 @@ using Windows.Storage.Provider;
 using Windows.Storage.Streams;
 using Windows.System;
 
-namespace ICsDatasheetFinder_8._1.ViewModels
+namespace ICsDatasheetFinder.ViewModels
 {
 	public class DatasheetViewModel : ViewModelBase
 	{

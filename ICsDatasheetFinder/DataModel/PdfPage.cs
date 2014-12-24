@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ICsDatasheetFinder_8._1.Data
+namespace ICsDatasheetFinder.Data
 {
 	public class DatasheetPage
 	{

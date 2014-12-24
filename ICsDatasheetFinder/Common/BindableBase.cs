@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ICsDatasheetFinder_8._1.Common
+namespace ICsDatasheetFinder.Common
 {
 	[Windows.Foundation.Metadata.WebHostHidden]
 	public abstract class BindableBase : INotifyPropertyChanged

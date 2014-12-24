@@ -1,7 +1,7 @@
 ﻿using Caliburn.Micro;
 using System.ComponentModel;
 
-namespace ICsDatasheetFinder_8._1.ViewModels
+namespace ICsDatasheetFinder.ViewModels
 {
 	public abstract class ViewModelBase : Screen, INotifyPropertyChanged
 	{

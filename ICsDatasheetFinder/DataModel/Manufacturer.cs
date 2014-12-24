@@ -2,7 +2,7 @@
 using System;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace ICsDatasheetFinder_8._1.Data
+namespace ICsDatasheetFinder.Data
 {
 	public class Manufacturer : Common.BindableBase
 	{

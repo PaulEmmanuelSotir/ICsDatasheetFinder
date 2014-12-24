@@ -7,17 +7,18 @@
     <ProjectGuid>{9CACB4B2-2E1C-42DC-BE07-4634386F7D9A}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ICsDatasheetFinder_8._1</RootNamespace>
-    <AssemblyName>ICsDatasheetFinder_8.1</AssemblyName>
+    <RootNamespace>ICsDatasheetFinder</RootNamespace>
+    <AssemblyName>ICsDatasheetFinder</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>ICsDatasheetFinder_8.1_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>ICsDatasheetFinder_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <PackageCertificateThumbprint>7E50A8917B4D74B3F7A124CD1A4326BD13C6BC34</PackageCertificateThumbprint>
+    <EnableProjectNCompatibleProfile>true</EnableProjectNCompatibleProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -92,6 +93,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseProjectNToolchain>true</UseProjectNToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -103,6 +105,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseProjectNToolchain>true</UseProjectNToolchain>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -141,8 +144,11 @@
     <Content Include="Data\datasheets.sqlite.compressed">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="ICsDatasheetFinder_8.1_StoreKey.pfx" />
-    <None Include="ICsDatasheetFinder_8.1_TemporaryKey.pfx" />
+    <None Include="C:\Program Files %28x86%29\MSBuild\Microsoft\.NetNative\NextSteps.mht">
+      <Link>NextSteps.mht</Link>
+    </None>
+    <None Include="ICsDatasheetFinder_StoreKey.pfx" />
+    <None Include="ICsDatasheetFinder_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <PRIResource Include="Resources\Strings\en-US\Resources.resw" />
     <PRIResource Include="Resources\Strings\fr\Resources.resw" />
@@ -929,6 +935,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="default.rd.xml" />
     <Content Include="Resources\Images\ElecDB_Featuring.scale-100.png" />
     <Content Include="Resources\Images\Logo.scale-100.png" />
     <Content Include="Resources\Images\Logo.scale-80.png" />

@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using System.Collections.Generic;
 
-namespace ICsDatasheetFinder_8._1.Data
+namespace ICsDatasheetFinder.Data
 {
 	public class Part : IEqualityComparer<Part>
 	{

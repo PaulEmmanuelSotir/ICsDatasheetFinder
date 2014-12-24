@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ICsDatasheetFinder_8._1.Common
+namespace ICsDatasheetFinder.Common
 {
 	public class IncrementalLoadingDatasheetList : IncrementalLoadingBase
 	{
