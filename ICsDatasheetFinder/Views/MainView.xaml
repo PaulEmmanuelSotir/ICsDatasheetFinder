@@ -185,20 +185,6 @@
 					</Grid>
 				</DataTemplate>
 			</HubSection>
-
-			<HubSection x:Name="ElectronicDatabaseFeaturingHubSection" x:Uid="ElectronicDatabaseFeaturingHeader" Header="Another usefull app on the Store">
-				<HubSection.HeaderTemplate>
-					<DataTemplate>
-						<TextBlock Style="{StaticResource SubheaderTextStyle}" Text="{Binding}"/>
-					</DataTemplate>
-				</HubSection.HeaderTemplate>
-				<DataTemplate>
-					<Image Source="ms-appx:///Resources/Images/ElecDB_Featuring.png" CacheMode="BitmapCache"
-						   calistoEffect:Tilt.IsTiltEnabled="True"
-						   HorizontalAlignment="Left" VerticalAlignment="Top"
-						   cal:Message.Attach="[Event Tapped] = [SeeElecDatabase()]" Stretch="None"/>
-				</DataTemplate>
-			</HubSection>
 		</Hub>
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup x:Name="Views">
@@ -231,9 +217,6 @@
 							<DiscreteObjectKeyFrame KeyTime="0" Value="Top"/>
 						</ObjectAnimationUsingKeyFrames>
 
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ElectronicDatabaseFeaturingHubSection" Storyboard.TargetProperty="Visibility">
-							<DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
-						</ObjectAnimationUsingKeyFrames>
 						<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ResultHubHeader" Storyboard.TargetProperty="Text">
 							<DiscreteObjectKeyFrame KeyTime="0" x:Uid="VerticalResultHubHeader"/>
 						</ObjectAnimationUsingKeyFrames>

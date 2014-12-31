@@ -59,14 +59,6 @@ namespace ICsDatasheetFinder.ViewModels
 				.Navigate();
 		}
 
-		/// <summary>
-		/// Ask windows store to display Electronic database app sheet
-		/// </summary>
-		private async void SeeElecDatabase()
-		{
-			await Launcher.LaunchUriAsync(new Uri("ms-windows-store:PDP?PFN=45311Paul-EmmanuelSotir.ElectronicDatabase_7q75p07zxm5km"));
-		}
-
 		// TODO : quand on recherche avec tout les résultats, conserver seulement les manufacturers concernés
 		/// <summary>
 		/// Searches matching part datasheet in SQLite database. 

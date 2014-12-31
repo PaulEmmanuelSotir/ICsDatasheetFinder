@@ -120,9 +120,6 @@
   <data name="DatasheetOf.Text" xml:space="preserve">
     <value>Datasheet of </value>
   </data>
-  <data name="ElectronicDatabaseFeaturingHeader.Header" xml:space="preserve">
-    <value>Also available on the store:</value>
-  </data>
   <data name="EnterAref_TextBlock.Text" xml:space="preserve">
     <value>Please enter an integrated circuit reference to find its datasheet:</value>
   </data>
