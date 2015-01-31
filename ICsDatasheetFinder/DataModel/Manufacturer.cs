@@ -19,7 +19,7 @@ namespace ICsDatasheetFinder.Data
 			set { SetProperty(ref _logo, value); }
 		}
 
-		public string LogoFileName => "\{Uri.EscapeDataString(name)}.jpg";
+		public string LogoFileName => $"{Uri.EscapeDataString(name)}.jpg";
 
 		private BitmapImage _logo;
 	}

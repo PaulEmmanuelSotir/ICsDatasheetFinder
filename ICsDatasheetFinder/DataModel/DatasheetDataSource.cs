@@ -81,7 +81,7 @@ namespace ICsDatasheetFinder.Data
 						return new List<Part>();
 
 					var manusQuery = manufacturers != null ? "AND ManufacturerId IN ( '" + String.Join("', '", manufacturers.Select((Manu) => Manu.Id)) + "' )" : string.Empty;
-					var query = MaxRsltCount != null ? "select * from Part where reference LIKE '%\{queryRef}%' \{manusQuery} LIMIT \{MaxRsltCount}" : "select * from Part where reference LIKE '%\{queryRef}%' \{manusQuery}";
+					var query = MaxRsltCount != null ? $"select * from Part where reference LIKE '%{queryRef}%' {manusQuery} LIMIT {MaxRsltCount}" : $"select * from Part where reference LIKE '%{queryRef}%' {manusQuery}";
 
 					using (var connection = new SQLiteConnection(Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.DATABASE_FILE_NAME), SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.ReadOnly))
 					{

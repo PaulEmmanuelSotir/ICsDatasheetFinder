@@ -53,7 +53,7 @@ namespace ICsDatasheetFinder.ViewModels
 		private void SeeDatasheet(ItemClickEventArgs e)
 		{
 			Part part = e.ClickedItem as Part;
-			navigationService.UriFor<DatasheetViewModel>()
+			_navigationService.UriFor<DatasheetViewModel>()
 				.WithParam<String>((instance) => instance.DatasheetURL, part.datasheetURL)
 				.WithParam<String>((instance) => instance.PartReference, part.reference)
 				.Navigate();
@@ -67,8 +67,7 @@ namespace ICsDatasheetFinder.ViewModels
 		private async void QueryForDatasheets()
 		{
 			// Cancel old datasheet queries and create a new CancellationTokenSource
-			if (_previousTokenSource != null)
-				_previousTokenSource.Cancel(true);
+			_previousTokenSource?.Cancel(true);
 			// TODO : wait for the canceled task (task cancelling is not instantaneous !)
 			_currentTokenSource = new CancellationTokenSource();
 			_previousTokenSource = _currentTokenSource;

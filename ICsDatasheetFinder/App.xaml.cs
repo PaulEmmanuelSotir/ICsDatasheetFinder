@@ -49,7 +49,7 @@ namespace ICsDatasheetFinder
 
 			// Show release note or decompress database if app is newly updated or has been launched for the first time.
 			var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-			string CurrentVersion = "\{Package.Current.Id.Version.Major}.\{Package.Current.Id.Version.Minor}.\{Package.Current.Id.Version.Build}.\{Package.Current.Id.Version.Revision}";
+			string CurrentVersion = $"{Package.Current.Id.Version.Major}.{Package.Current.Id.Version.Minor}.{Package.Current.Id.Version.Build}.{Package.Current.Id.Version.Revision}";
 			object firstLaunchFlag = localSettings.Values["FirstLaunch"];
 			if (firstLaunchFlag is string)
 			{
@@ -143,7 +143,7 @@ namespace ICsDatasheetFinder
 		private async Task DecompressDatabase(bool IsFirstLaunch)
 		{
 			// Decompress and copy database to Application Data Local Folder.
-			var compressedDBAsyncOp = Package.Current.InstalledLocation.GetFileAsync("Data\\\{DATABASE_FILE_NAME}.compressed");
+			var compressedDBAsyncOp = Package.Current.InstalledLocation.GetFileAsync($"Data\\{DATABASE_FILE_NAME}.compressed");
 			var decompressedDB = await ApplicationData.Current.LocalFolder.CreateFileAsync(DATABASE_FILE_NAME, IsFirstLaunch ? CreationCollisionOption.FailIfExists : CreationCollisionOption.ReplaceExisting);
 			var compressedDB = await compressedDBAsyncOp;
 

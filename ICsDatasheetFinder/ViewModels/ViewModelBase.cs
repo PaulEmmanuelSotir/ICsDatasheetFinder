@@ -5,23 +5,23 @@ namespace ICsDatasheetFinder.ViewModels
 {
 	public abstract class ViewModelBase : Screen, INotifyPropertyChanged
 	{
-		protected readonly INavigationService navigationService;
+		protected readonly INavigationService _navigationService;
 
 		protected ViewModelBase(INavigationService navigationService)
 		{
-			this.navigationService = navigationService;
+			_navigationService = navigationService;
 		}
 
 		public void GoTo<ViewModelType>()
 		{
-			navigationService.NavigateToViewModel<ViewModelType>();
+			_navigationService.NavigateToViewModel<ViewModelType>();
 		}
 
 		public void GoBack()
 		{
-			navigationService.GoBack();
+			_navigationService.GoBack();
 		}
 
-		public bool CanGoBack => navigationService.CanGoBack;
+		public bool CanGoBack => _navigationService.CanGoBack;
 	}
 }
